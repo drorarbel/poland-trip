@@ -544,7 +544,7 @@
     <div class="hero-content">
       <div class="hero-flag">🇵🇱</div>
       <div class="hero-title">טיול משפחתי<br>לפולין 2026</div>
-      <div class="hero-subtitle">13–26 יולי · 14 ימים · 5 אזורים</div>
+      <div class="hero-subtitle">13–26 יולי · 14 ימים · 5 אזורים · משפחת ארבל</div>
     </div>
     <div class="countdown-bar">
       <div class="countdown-label">⏳ ספירה לאחור ליציאה</div>
@@ -557,22 +557,23 @@
     </div>
   </div>
 
-  <div class="section-title">מה לקחת בחשבון</div>
+  <!-- WEATHER + QUICK CARDS -->
+  <div class="section-title">מזג אוויר ומידע</div>
   <div class="quick-grid">
-    <div class="quick-card">
-      <div class="qc-icon">🌡️</div>
-      <div class="qc-label">מזג אוויר</div>
-      <div class="qc-value">22–28°C</div>
+    <div class="quick-card" id="weather-today" onclick="fetchWeather()" style="cursor:pointer;">
+      <div class="qc-icon" id="wx-icon-today">🌡️</div>
+      <div class="qc-label" id="wx-label-today">מזג אוויר היום</div>
+      <div class="qc-value" id="wx-val-today">טוען...</div>
+    </div>
+    <div class="quick-card" id="weather-tomorrow" onclick="fetchWeather()" style="cursor:pointer;">
+      <div class="qc-icon" id="wx-icon-tmrw">🌤️</div>
+      <div class="qc-label" id="wx-label-tmrw">מחר</div>
+      <div class="qc-value" id="wx-val-tmrw">טוען...</div>
     </div>
     <div class="quick-card">
       <div class="qc-icon">💵</div>
       <div class="qc-label">מטבע</div>
       <div class="qc-value">זלוטי (PLN)</div>
-    </div>
-    <div class="quick-card">
-      <div class="qc-icon">🚗</div>
-      <div class="qc-label">רכב</div>
-      <div class="qc-value">Kia Sportage</div>
     </div>
     <div class="quick-card">
       <div class="qc-icon">📍</div>
@@ -581,60 +582,209 @@
     </div>
   </div>
 
+  <!-- FLIGHTS -->
   <div class="divider" style="margin-top:8px;"></div>
-  <div class="section-title">⚠️ תזכורות חשובות</div>
-  <div class="tips-scroll">
-    <div class="tips-inner">
-      <div class="tip-card">
-        <span class="tip-emoji">💶</span>
-        <div class="tip-title">מזומן PLN 500</div>
-        <div class="tip-text">Kaszubska Nirvana דורשים פיקדון במזומן — תכינו לפני יציאה מהעיר!</div>
-      </div>
-      <div class="tip-card">
-        <span class="tip-emoji">🖨️</span>
-        <div class="tip-title">הדפסת שובר Ofran</div>
-        <div class="tip-text">חובה להדפיס את שובר הרכב לפני הטיסה. בלי הדפסה אין רכב!</div>
-      </div>
-      <div class="tip-card">
-        <span class="tip-emoji">🏦</span>
-        <div class="tip-title">Warmia Resort</div>
-        <div class="tip-text">תשלום מראש בהעברה בנקאית — וודאו שבוצע לפני הגעה.</div>
-      </div>
-      <div class="tip-card">
-        <span class="tip-emoji">🎫</span>
-        <div class="tip-title">מוזיאון קופרניקוס</div>
-        <div class="tip-text">מוזיאון המדע בוורשה — חובה להזמין כרטיסים אונליין מראש!</div>
-      </div>
-      <div class="tip-card">
-        <span class="tip-emoji">🩺</span>
-        <div class="tip-title">ביטוח נסיעה</div>
-        <div class="tip-text">שמרו את פרטי הביטוח בנגישות. הורידו עותק לכל אחד.</div>
-      </div>
-    </div>
-  </div>
+  <div class="section-title">✈️ הטיסות שלנו — SUNDOR / EL AL</div>
 
-  <div class="divider" style="margin-top:12px;"></div>
-  <div class="section-title">✈️ הטיסה שלנו</div>
-  <div class="flight-card" style="margin: 0 1rem 1rem;">
+  <!-- Outbound -->
+  <div class="flight-card" style="margin: 0 1rem 10px;">
     <div class="flight-header">
-      <div><div class="flight-label">טיסת יציאה</div><div class="flight-airline">LOT / El Al</div></div>
-      <div style="color:rgba(255,255,255,0.8); font-size:11px;">13 יולי</div>
+      <div><div class="flight-label">✈️ טיסת יציאה · LY5101</div><div class="flight-airline">EL AL / SUNDOR · קוד הזמנה: ZRCJ4O</div></div>
+      <div style="color:rgba(255,255,255,0.85); font-size:12px; font-weight:600;">13 יולי</div>
     </div>
     <div class="flight-row">
       <div class="flight-city">
         <div class="flight-iata">TLV</div>
-        <div class="flight-name">תל אביב</div>
+        <div class="flight-name">בן גוריון</div>
+        <div class="flight-time">17:30</div>
       </div>
       <div class="flight-arrow">
         <div class="flight-plane">✈️</div>
         <div class="flight-line"></div>
-        <div class="flight-duration">~3.5 שעות</div>
+        <div class="flight-duration">4:00 שעות · טרמינל 3</div>
       </div>
       <div class="flight-city">
         <div class="flight-iata">WAW</div>
-        <div class="flight-name">וורשה</div>
+        <div class="flight-name">ורשה שופן</div>
+        <div class="flight-time">20:30</div>
       </div>
     </div>
+    <div style="padding: 0 1rem 0.75rem; font-size:11px; color:var(--gray-400); border-top:1px solid var(--gray-100); padding-top:0.5rem; margin-top:-2px;">
+      👨‍👩‍👧‍👦 דרור · ליאת · יהליאור · מיאל אדר · מיה אמור &nbsp;|&nbsp; 🧳 ידנית בלבד (0PC)
+    </div>
+  </div>
+
+  <!-- Return -->
+  <div class="flight-card" style="margin: 0 1rem 1rem;">
+    <div class="flight-header" style="background:#374151;">
+      <div><div class="flight-label">🏠 טיסת חזרה · LY5102</div><div class="flight-airline">EL AL / SUNDOR · קוד הזמנה: ZRCJ4O</div></div>
+      <div style="color:rgba(255,255,255,0.85); font-size:12px; font-weight:600;">26 יולי</div>
+    </div>
+    <div class="flight-row">
+      <div class="flight-city">
+        <div class="flight-iata">WAW</div>
+        <div class="flight-name">ורשה שופן</div>
+        <div class="flight-time">10:05</div>
+      </div>
+      <div class="flight-arrow">
+        <div class="flight-plane" style="transform:none;">✈️</div>
+        <div class="flight-line"></div>
+        <div class="flight-duration">3:50 שעות · טרמינל 3</div>
+      </div>
+      <div class="flight-city">
+        <div class="flight-iata">TLV</div>
+        <div class="flight-name">בן גוריון</div>
+        <div class="flight-time">14:55</div>
+      </div>
+    </div>
+    <div style="padding: 0 1rem 0.75rem; font-size:11px; color:var(--gray-400); border-top:1px solid var(--gray-100); padding-top:0.5rem; margin-top:-2px;">
+      👨‍👩‍👧‍👦 דרור · ליאת · יהליאור · מיאל אדר · מיה אמור &nbsp;|&nbsp; 🧳 ידנית בלבד (0PC)
+    </div>
+  </div>
+
+  <!-- CAR RENTAL -->
+  <div class="divider"></div>
+  <div class="section-title">🚗 רכב שכור — Budget Poland</div>
+  <div style="margin: 0 1rem 1rem; background:var(--white); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-card); border:1px solid var(--gray-200);">
+    <div style="background:#F59E0B; padding:0.625rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+      <div style="color:white; font-size:12px; font-weight:600;">Ofran Prepaid Voucher · שובר 45184313</div>
+      <a href="https://www.ofran.co.il" target="_blank" style="color:white; font-size:10px; text-decoration:underline;">אתר אופרן</a>
+    </div>
+    <div style="padding:0.875rem 1rem; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <div style="font-size:9px; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:3px;">🟢 לקיחה</div>
+        <div style="font-size:13px; font-weight:600;">14 יולי · 10:00</div>
+        <div style="font-size:11px; color:var(--gray-600); margin-top:2px;">Warsaw Chopin Airport</div>
+        <a href="tel:+48601334285" style="font-size:10px; color:var(--red); text-decoration:none; margin-top:2px; display:block;">📞 +48-601334285</a>
+      </div>
+      <div>
+        <div style="font-size:9px; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:3px;">🔴 החזרה</div>
+        <div style="font-size:13px; font-weight:600;">23 יולי · 10:00</div>
+        <div style="font-size:11px; color:var(--gray-600); margin-top:2px;">Warsaw Marriott Hotel</div>
+        <a href="tel:+48601332889" style="font-size:10px; color:var(--red); text-decoration:none; margin-top:2px; display:block;">📞 +48-601332889</a>
+      </div>
+    </div>
+    <div style="padding:0 1rem 0.75rem; display:flex; gap:8px; flex-wrap:wrap;">
+      <span style="background:var(--gray-100); border-radius:20px; padding:3px 10px; font-size:10px; color:var(--gray-600);">🚙 Kia Sportage אוטומטי</span>
+      <span style="background:var(--gray-100); border-radius:20px; padding:3px 10px; font-size:10px; color:var(--gray-600);">📅 9 ימים</span>
+      <span style="background:#D1FAE5; border-radius:20px; padding:3px 10px; font-size:10px; color:#065F46;">✓ Super CDW כלול</span>
+      <span style="background:#D1FAE5; border-radius:20px; padding:3px 10px; font-size:10px; color:#065F46;">✓ ק"מ ללא הגבלה</span>
+    </div>
+    <div style="margin:0 1rem 0.75rem; padding:0.5rem 0.75rem; background:#FFF0F0; border-right:3px solid var(--red); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:11px; color:var(--red-dark);">
+      ⚠️ חובה להדפיס את השובר! לא ניתן להציג בנייד. הביאו גם רישיון נהיגה ישראלי + בינלאומי + דרכון + כרטיס אשראי פיזי.
+    </div>
+  </div>
+
+  <!-- EDITABLE REMINDERS -->
+  <div class="divider"></div>
+  <div style="display:flex; align-items:center; justify-content:space-between; padding: 1.25rem 1.25rem 0.5rem;">
+    <div class="section-title" style="padding:0;">⚠️ תזכורות חשובות</div>
+    <button onclick="addReminder()" style="background:var(--red); color:white; border:none; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font);">+ הוסף</button>
+  </div>
+  <div id="reminders-list" style="padding:0 1rem 0.5rem; display:flex; flex-direction:column; gap:8px;"></div>
+
+  <!-- DOCUMENTS -->
+  <div class="divider" style="margin-top:4px;"></div>
+  <div class="section-title">📁 מסמכים חשובים</div>
+  <div style="padding:0 1rem 1rem; display:flex; flex-direction:column; gap:8px;">
+
+    <!-- Flights -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">✈️ טיסות</div>
+      <div class="emergency-item" style="cursor:default;">
+        <div class="emergency-icon" style="background:#FEE2E2; font-size:18px;">📄</div>
+        <div class="emergency-text"><div class="emergency-name">כרטיסי טיסה — LY5101 / LY5102</div><div class="emergency-number">ZRCJ4O · SUNDOR / EL AL · 5 נוסעים</div></div>
+        <div style="font-size:10px; color:#10B981; font-weight:600;">✓ OK</div>
+      </div>
+    </div>
+
+    <!-- Car -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">🚗 רכב</div>
+      <div class="emergency-item" style="cursor:default;">
+        <div class="emergency-icon" style="background:#FEF3C7; font-size:18px;">📄</div>
+        <div class="emergency-text"><div class="emergency-name">שובר Ofran · Budget Poland</div><div class="emergency-number">שובר 45184313 · אישור 47885518IL2</div></div>
+        <div style="font-size:10px; color:#F59E0B; font-weight:600;">🖨️ הדפס!</div>
+      </div>
+    </div>
+
+    <!-- Passports -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">🛂 דרכונים — כולם בתוקף ✅</div>
+      <div style="padding:0.5rem 1rem; display:flex; flex-direction:column; gap:0;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">👨 דרור</div>
+          <div style="font-size:11px; color:var(--gray-600);">34199501 · עד 10/12/2029</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">👩 ליאת</div>
+          <div style="font-size:11px; color:var(--gray-600);">34671446 · עד 23/02/2031</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">🧒 יהליאור</div>
+          <div style="font-size:11px; color:var(--gray-600);">36791551 · עד 24/12/2027</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">🧒 מיאל אדר</div>
+          <div style="font-size:11px; color:var(--gray-600);">36791335 · עד 24/12/2027</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0;">
+          <div style="font-size:12px; font-weight:600;">👧 מיה אמור</div>
+          <div style="font-size:11px; color:var(--gray-600);">36796116 · עד 24/12/2027</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Driving License -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid #FCA5A5; overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:#FEE2E2; padding:0.4rem 1rem; font-size:10px; color:#991B1B; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">🪪 רישיון נהיגה — דרור ⚠️</div>
+      <div class="emergency-item" style="cursor:default;">
+        <div class="emergency-icon" style="background:#D1FAE5; font-size:18px;">✅</div>
+        <div class="emergency-text"><div class="emergency-name">רישיון ישראלי — 8189982</div><div class="emergency-number">תוקף עד 06/01/2027 · B C1</div></div>
+        <div style="font-size:10px; color:#10B981; font-weight:600;">בתוקף</div>
+      </div>
+      <div class="emergency-item" style="cursor:default; border-top:1px solid var(--gray-100); background:#FFF0F0;">
+        <div class="emergency-icon" style="background:#FEE2E2; font-size:18px;">⚠️</div>
+        <div class="emergency-text">
+          <div class="emergency-name" style="color:var(--red);">רישיון בינלאומי — 22288883</div>
+          <div class="emergency-number" style="color:var(--red);">פג תוקף 26/07/2025 — חובה לחדש לפני 13 יולי!</div>
+        </div>
+        <div style="font-size:10px; color:var(--red); font-weight:700;">פג!</div>
+      </div>
+    </div>
+
+    <!-- Credit Cards -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">💳 כרטיסי אשראי — פיזי בלבד!</div>
+      <div style="padding:0.5rem 1rem 0.75rem; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:10px; color:var(--gray-400); font-weight:600; margin-bottom:2px;">👨 דרור</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">Visa HTZ ...1282</span>
+          <span style="font-size:10px; background:#D1FAE5; color:#065F46; border-radius:12px; padding:2px 8px;">✓ 01/26</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">MAX Mastercard ...4697</span>
+          <span style="font-size:10px; background:#FEF3C7; color:#92400E; border-radius:12px; padding:2px 8px;">⚠️ 07/25</span>
+        </div>
+        <div style="border-top:1px solid var(--gray-100); margin-top:4px; padding-top:6px; font-size:10px; color:var(--gray-400); font-weight:600; margin-bottom:2px;">👩 ליאת</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">Visa HTZ ...2561</span>
+          <span style="font-size:10px; background:#D1FAE5; color:#065F46; border-radius:12px; padding:2px 8px;">✓ 01/26</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">MAX Mastercard ...5193</span>
+          <span style="font-size:10px; background:#D1FAE5; color:#065F46; border-radius:12px; padding:2px 8px;">✓ בתוקף</span>
+        </div>
+        <div style="margin-top:6px; padding:0.5rem 0.75rem; background:#FFF0F0; border-right:3px solid var(--red); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:11px; color:var(--red-dark);">
+          ⚠️ Budget לא מקבל Apple Pay / Google Pay — חובה כרטיס פיזי!
+        </div>
+      </div>
+    </div>
+
   </div>
 </section>
 
@@ -1400,7 +1550,93 @@ function updateCountdown() {
 updateCountdown();
 setInterval(updateCountdown, 1000);
 
-// ====== CURRENCY ======
+// ====== WEATHER ======
+const WX_ICONS = {'0':'☀️','1':'🌤️','2':'⛅','3':'☁️','45':'🌫️','48':'🌫️','51':'🌦️','53':'🌦️','55':'🌧️','61':'🌧️','63':'🌧️','65':'🌧️','80':'🌦️','81':'🌧️','82':'⛈️','95':'⛈️'};
+const WX_DESC = {'0':'שמש','1':'בעיקר שמשי','2':'חלקית מעונן','3':'מעונן','45':'ערפל','51':'גשם קל','61':'גשם','80':'מקלחות','95':'סערה'};
+
+async function fetchWeather() {
+  try {
+    // Warsaw coords
+    const url = 'https://api.open-meteo.com/v1/forecast?latitude=52.23&longitude=21.01&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe/Warsaw&forecast_days=2';
+    const r = await fetch(url);
+    const d = await r.json();
+    const codes = d.daily.weathercode;
+    const maxT = d.daily.temperature_2m_max;
+    const minT = d.daily.temperature_2m_min;
+
+    const icon0 = WX_ICONS[String(codes[0])] || '🌡️';
+    const desc0 = WX_DESC[String(codes[0])] || '';
+    document.getElementById('wx-icon-today').textContent = icon0;
+    document.getElementById('wx-label-today').textContent = 'ורשה היום';
+    document.getElementById('wx-val-today').textContent = `${Math.round(maxT[0])}° / ${Math.round(minT[0])}° ${desc0}`;
+
+    const icon1 = WX_ICONS[String(codes[1])] || '🌡️';
+    const desc1 = WX_DESC[String(codes[1])] || '';
+    document.getElementById('wx-icon-tmrw').textContent = icon1;
+    document.getElementById('wx-label-tmrw').textContent = 'ורשה מחר';
+    document.getElementById('wx-val-tmrw').textContent = `${Math.round(maxT[1])}° / ${Math.round(minT[1])}° ${desc1}`;
+  } catch(e) {
+    document.getElementById('wx-val-today').textContent = 'לחץ לרענון';
+    document.getElementById('wx-val-tmrw').textContent = 'לחץ לרענון';
+  }
+}
+fetchWeather();
+
+// ====== EDITABLE REMINDERS ======
+const DEFAULT_REMINDERS = [
+  { emoji:'🚨', text:'רישיון נהיגה בינלאומי פג 26/07/2025 — חדש אותו לפני 13 יולי!', done:false },
+  { emoji:'💶', text:'מזומן PLN 500 — פיקדון Kaszubska Nirvana', done:false },
+  { emoji:'🖨️', text:'הדפסת שובר Ofran לפני הטיסה (לא ניתן בנייד!)', done:false },
+  { emoji:'🏦', text:'תשלום Warmia Resort בהעברה בנקאית', done:false },
+  { emoji:'🎫', text:'הזמנת כרטיסים למוזיאון קופרניקוס מראש', done:false },
+  { emoji:'🩺', text:'ביטוח נסיעות — שמרו פרטי פוליסה', done:false },
+];
+
+let reminders = JSON.parse(localStorage.getItem('poland-reminders') || 'null') || DEFAULT_REMINDERS;
+
+function saveReminders() {
+  try { localStorage.setItem('poland-reminders', JSON.stringify(reminders)); } catch(e){}
+}
+
+function renderReminders() {
+  const list = document.getElementById('reminders-list');
+  list.innerHTML = '';
+  reminders.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = `background:${r.done ? '#F0FDF4' : 'var(--white)'}; border-radius:var(--radius-sm); border:1px solid ${r.done ? '#BBF7D0' : 'var(--gray-200)'}; padding:0.625rem 0.875rem; display:flex; align-items:center; gap:10px; transition:all 0.2s;`;
+    div.innerHTML = `
+      <span style="font-size:18px; flex-shrink:0;">${r.emoji}</span>
+      <span style="flex:1; font-size:12px; color:${r.done ? 'var(--gray-400)' : 'var(--gray-800)'}; text-decoration:${r.done ? 'line-through' : 'none'}; line-height:1.4;">${r.text}</span>
+      <button onclick="toggleReminder(${i})" style="background:${r.done ? '#10B981' : 'var(--gray-200)'}; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer; font-size:12px; flex-shrink:0; color:${r.done ? 'white' : 'var(--gray-600)'};">${r.done ? '✓' : '○'}</button>
+      <button onclick="deleteReminder(${i})" style="background:none; border:none; color:var(--gray-400); cursor:pointer; font-size:14px; flex-shrink:0; padding:0;">✕</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function toggleReminder(i) {
+  reminders[i].done = !reminders[i].done;
+  saveReminders();
+  renderReminders();
+}
+
+function deleteReminder(i) {
+  reminders.splice(i, 1);
+  saveReminders();
+  renderReminders();
+}
+
+function addReminder() {
+  const text = prompt('תזכורת חדשה:');
+  if (!text || !text.trim()) return;
+  reminders.push({ emoji:'📌', text:text.trim(), done:false });
+  saveReminders();
+  renderReminders();
+}
+
+renderReminders();
+
+
 const RATE_ILS_TO_PLN = 1.18;
 
 function convertILS() {
