@@ -1,0 +1,2337 @@
+<!DOCTYPE html>
+<html lang="he" dir="rtl">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+<meta name="theme-color" content="#C0001C">
+<title>🇵🇱 טיול פולין — משפחת דרור</title>
+<link rel="manifest" id="pwa-manifest">
+<link rel="apple-touch-icon" id="apple-icon">
+<meta name="apple-mobile-web-app-title" content="פולין 2026">
+<meta name="application-name" content="פולין 2026">
+<style>
+  /* ====== SPLASH ====== */
+  #splash {
+    position: fixed; inset: 0; z-index: 9999;
+    background: #C0001C;
+    display: flex; flex-direction: column;
+    align-items: center; justify-content: center;
+    gap: 16px;
+    transition: opacity 0.5s ease;
+  }
+  #splash.hide { opacity: 0; pointer-events: none; }
+  .splash-flag { font-size: 72px; animation: splashPop 0.5s ease; }
+  .splash-title { color: white; font-size: 24px; font-weight: 700; font-family: system-ui, sans-serif; }
+  .splash-sub { color: rgba(255,255,255,0.7); font-size: 13px; font-family: system-ui, sans-serif; }
+  .splash-dots { display: flex; gap: 8px; margin-top: 8px; }
+  .splash-dot {
+    width: 8px; height: 8px; border-radius: 50%;
+    background: rgba(255,255,255,0.4);
+    animation: splashDot 1.2s ease infinite;
+  }
+  .splash-dot:nth-child(2) { animation-delay: 0.2s; }
+  .splash-dot:nth-child(3) { animation-delay: 0.4s; }
+  @keyframes splashPop { from { transform: scale(0.5); opacity: 0; } to { transform: scale(1); opacity: 1; } }
+  @keyframes splashDot { 0%,80%,100% { background: rgba(255,255,255,0.4); } 40% { background: white; } }
+
+  /* ====== INSTALL BANNER ====== */
+  #install-banner {
+    position: fixed; bottom: 72px; left: 50%; transform: translateX(-50%);
+    width: calc(100% - 32px); max-width: 398px;
+    background: #1C1C1E; color: white; border-radius: 14px;
+    padding: 12px 14px; display: flex; align-items: center; gap: 12px;
+    z-index: 500; box-shadow: 0 4px 24px rgba(0,0,0,0.25);
+    animation: slideUp 0.4s ease;
+    display: none;
+  }
+  #install-banner.show { display: flex; }
+  @keyframes slideUp { from { transform: translateX(-50%) translateY(20px); opacity: 0; } to { transform: translateX(-50%) translateY(0); opacity: 1; } }
+  .install-icon { font-size: 28px; flex-shrink: 0; }
+  .install-text { flex: 1; }
+  .install-title { font-size: 13px; font-weight: 600; margin-bottom: 2px; font-family: system-ui; }
+  .install-sub { font-size: 11px; color: rgba(255,255,255,0.6); font-family: system-ui; }
+  .install-btn {
+    background: #C0001C; color: white; border: none;
+    border-radius: 8px; padding: 7px 14px;
+    font-size: 12px; font-weight: 600; cursor: pointer;
+    font-family: system-ui; white-space: nowrap; flex-shrink: 0;
+  }
+  .install-close {
+    color: rgba(255,255,255,0.5); font-size: 18px;
+    cursor: pointer; flex-shrink: 0; line-height: 1;
+    background: none; border: none;
+  }
+
+  :root {
+    --red: #C0001C;
+    --red-dark: #8B0013;
+    --red-light: #F5C6CB;
+    --white: #FFFFFF;
+    --off-white: #FAF9F7;
+    --gray-100: #F4F3F0;
+    --gray-200: #E8E6E1;
+    --gray-400: #A09E99;
+    --gray-600: #6B6966;
+    --gray-800: #2C2B29;
+    --font: 'Segoe UI', system-ui, -apple-system, sans-serif;
+    --radius: 14px;
+    --radius-sm: 8px;
+    --shadow: 0 2px 16px rgba(0,0,0,0.08);
+    --shadow-card: 0 1px 6px rgba(0,0,0,0.06);
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; -webkit-tap-highlight-color: transparent; }
+  body { font-family: var(--font); background: var(--off-white); color: var(--gray-800); overflow-x: hidden; max-width: 430px; margin: 0 auto; min-height: 100vh; position: relative; }
+
+  /* ====== NAV ====== */
+  .bottom-nav {
+    position: fixed; bottom: 0; left: 50%; transform: translateX(-50%);
+    width: 100%; max-width: 430px;
+    background: var(--white); border-top: 1px solid var(--gray-200);
+    display: flex; z-index: 100;
+    padding-bottom: env(safe-area-inset-bottom);
+  }
+  .nav-btn {
+    flex: 1; display: flex; flex-direction: column; align-items: center;
+    padding: 8px 0 10px; cursor: pointer; gap: 3px;
+    font-size: 9px; color: var(--gray-400); letter-spacing: 0.01em;
+    transition: color 0.2s; border: none; background: none;
+  }
+  .nav-btn .icon { font-size: 22px; line-height: 1; }
+  .nav-btn.active { color: var(--red); }
+  .nav-btn.active .icon { transform: translateY(-1px); }
+
+  /* ====== SCREENS ====== */
+  .screen { display: none; padding-bottom: 80px; min-height: 100vh; }
+  .screen.active { display: block; }
+
+  /* ====== HOME ====== */
+  .hero {
+    background: var(--red);
+    padding: 0;
+    position: relative;
+    overflow: hidden;
+    min-height: 240px;
+    display: flex; flex-direction: column; justify-content: flex-end;
+  }
+  .hero-bg {
+    position: absolute; inset: 0;
+    background: linear-gradient(135deg, #C0001C 0%, #8B0013 100%);
+  }
+  .hero-pattern {
+    position: absolute; inset: 0; opacity: 0.06;
+    background-image: repeating-linear-gradient(0deg, transparent, transparent 30px, white 30px, white 31px),
+                      repeating-linear-gradient(90deg, transparent, transparent 30px, white 30px, white 31px);
+  }
+  .hero-eagle {
+    position: absolute; right: -10px; top: 10px;
+    font-size: 120px; opacity: 0.12; transform: scaleX(-1);
+    line-height: 1;
+  }
+  .hero-content { position: relative; padding: 1.25rem 1.25rem 1.5rem; }
+  .hero-flag { font-size: 28px; margin-bottom: 4px; }
+  .hero-title { color: white; font-size: 26px; font-weight: 700; line-height: 1.1; margin-bottom: 4px; }
+  .hero-subtitle { color: rgba(255,255,255,0.75); font-size: 13px; }
+  
+  .countdown-bar {
+    background: rgba(0,0,0,0.2);
+    backdrop-filter: blur(4px);
+    padding: 0.75rem 1.25rem;
+    position: relative;
+  }
+  .countdown-label { color: rgba(255,255,255,0.7); font-size: 11px; margin-bottom: 6px; }
+  .countdown-numbers { display: flex; gap: 12px; }
+  .cd-item { text-align: center; }
+  .cd-num { color: white; font-size: 22px; font-weight: 700; line-height: 1; display: block; }
+  .cd-unit { color: rgba(255,255,255,0.6); font-size: 9px; display: block; margin-top: 2px; }
+
+  .section-title {
+    font-size: 13px; font-weight: 600; color: var(--gray-600);
+    padding: 1.25rem 1.25rem 0.5rem;
+    letter-spacing: 0.05em; text-transform: uppercase;
+  }
+
+  /* Quick info cards */
+  .quick-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0 1rem 0.5rem; }
+  .quick-card {
+    background: var(--white); border-radius: var(--radius);
+    padding: 0.875rem 1rem;
+    box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+  }
+  .qc-icon { font-size: 20px; margin-bottom: 6px; }
+  .qc-label { font-size: 10px; color: var(--gray-400); margin-bottom: 2px; }
+  .qc-value { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+
+  /* Day highlight */
+  .today-card {
+    margin: 0 1rem 0.5rem;
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+  }
+  .today-header {
+    background: var(--red); color: white;
+    padding: 0.625rem 1rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .today-header-label { font-size: 10px; opacity: 0.8; }
+  .today-header-day { font-size: 13px; font-weight: 600; }
+  .today-body { padding: 0.875rem 1rem; }
+  .today-location { font-size: 16px; font-weight: 600; margin-bottom: 4px; }
+  .today-hotel { font-size: 12px; color: var(--gray-600); display: flex; align-items: center; gap: 6px; }
+
+  /* Tips row */
+  .tips-scroll { overflow-x: auto; scrollbar-width: none; padding: 0 1rem 0.25rem; }
+  .tips-scroll::-webkit-scrollbar { display: none; }
+  .tips-inner { display: flex; gap: 10px; }
+  .tip-card {
+    flex: none; width: 220px;
+    background: var(--white); border-radius: var(--radius);
+    padding: 0.875rem; border: 1px solid var(--gray-200);
+    box-shadow: var(--shadow-card);
+  }
+  .tip-emoji { font-size: 20px; margin-bottom: 6px; display: block; }
+  .tip-title { font-size: 12px; font-weight: 600; margin-bottom: 4px; }
+  .tip-text { font-size: 11px; color: var(--gray-600); line-height: 1.5; }
+
+  /* ====== ITINERARY ====== */
+  .itin-day {
+    margin: 0.5rem 1rem;
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+  }
+  .itin-day-header {
+    padding: 0.75rem 1rem;
+    display: flex; align-items: center; gap: 12px;
+    cursor: pointer;
+  }
+  .itin-date-badge {
+    width: 42px; height: 42px; border-radius: 10px;
+    background: var(--red); color: white;
+    display: flex; flex-direction: column; align-items: center; justify-content: center;
+    flex-shrink: 0;
+  }
+  .itin-date-num { font-size: 16px; font-weight: 700; line-height: 1; }
+  .itin-date-mon { font-size: 8px; opacity: 0.8; }
+  .itin-info { flex: 1; }
+  .itin-day-title { font-size: 14px; font-weight: 600; }
+  .itin-day-sub { font-size: 11px; color: var(--gray-400); margin-top: 2px; }
+  .itin-chevron { font-size: 16px; color: var(--gray-400); transition: transform 0.25s; }
+  .itin-day.expanded .itin-chevron { transform: rotate(180deg); }
+  .itin-body { display: none; border-top: 1px solid var(--gray-200); }
+  .itin-day.expanded .itin-body { display: block; }
+
+  .itin-stop {
+    padding: 0.75rem 1rem;
+    border-bottom: 1px solid var(--gray-100);
+    display: flex; gap: 12px; align-items: flex-start;
+  }
+  .itin-stop:last-child { border-bottom: none; }
+  .stop-dot {
+    width: 32px; height: 32px; border-radius: 8px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 15px; flex-shrink: 0; margin-top: 2px;
+  }
+  .stop-text { flex: 1; }
+  .stop-name { font-size: 13px; font-weight: 500; margin-bottom: 2px; }
+  .stop-desc { font-size: 11px; color: var(--gray-600); line-height: 1.5; }
+  .stop-time { font-size: 10px; color: var(--gray-400); margin-top: 3px; }
+
+  .hotel-strip {
+    background: var(--gray-100); padding: 0.625rem 1rem;
+    display: flex; align-items: center; gap: 8px;
+    border-top: 1px solid var(--gray-200);
+  }
+  .hotel-strip-icon { font-size: 16px; }
+  .hotel-strip-text { font-size: 11px; }
+  .hotel-strip-name { font-weight: 600; color: var(--gray-800); }
+  .hotel-strip-note { color: var(--gray-400); }
+
+  /* ====== LOCATIONS ====== */
+  .loc-grid { padding: 0 1rem; display: flex; flex-direction: column; gap: 12px; }
+  .loc-card {
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+    cursor: pointer;
+  }
+  .loc-banner {
+    height: 90px; display: flex; align-items: center; justify-content: center;
+    position: relative; overflow: hidden;
+  }
+  .loc-banner-emoji { font-size: 48px; }
+  .loc-banner-overlay {
+    position: absolute; inset: 0;
+    background: linear-gradient(to bottom, transparent 40%, rgba(0,0,0,0.45) 100%);
+  }
+  .loc-banner-title {
+    position: absolute; bottom: 8px; right: 12px;
+    color: white; font-size: 15px; font-weight: 700;
+    text-shadow: 0 1px 4px rgba(0,0,0,0.5);
+  }
+  .loc-banner-dates {
+    position: absolute; bottom: 8px; left: 12px;
+    color: rgba(255,255,255,0.85); font-size: 10px;
+  }
+  .loc-body { padding: 0.875rem 1rem; }
+  .loc-desc { font-size: 12px; color: var(--gray-600); line-height: 1.6; margin-bottom: 0.75rem; }
+  .loc-facts { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 0.75rem; }
+  .loc-fact {
+    background: var(--gray-100); border-radius: 20px;
+    padding: 4px 10px; font-size: 10px; color: var(--gray-600);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .loc-activities { display: flex; flex-wrap: wrap; gap: 6px; }
+  .loc-activity {
+    background: #FFF0F0; border: 1px solid #F5C6CB; border-radius: 20px;
+    padding: 4px 10px; font-size: 11px; color: var(--red-dark);
+    display: flex; align-items: center; gap: 4px;
+  }
+  .loc-tip {
+    margin-top: 10px; padding: 0.625rem 0.75rem;
+    background: #FFF8E1; border-right: 3px solid #F59E0B;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 11px; color: #92400E; line-height: 1.5;
+  }
+  .loc-warning {
+    margin-top: 8px; padding: 0.5rem 0.75rem;
+    background: #FFF0F0; border-right: 3px solid var(--red);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 11px; color: var(--red-dark); line-height: 1.5;
+  }
+
+  /* ====== HOTELS ====== */
+  .hotel-list { padding: 0 1rem; display: flex; flex-direction: column; gap: 10px; }
+  .hotel-card {
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+  }
+  .hotel-card-header {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0.875rem 1rem;
+  }
+  .hotel-icon {
+    width: 44px; height: 44px; border-radius: 10px;
+    background: var(--gray-100); display: flex; align-items: center; justify-content: center;
+    font-size: 22px; flex-shrink: 0;
+  }
+  .hotel-card-info { flex: 1; }
+  .hotel-card-name { font-size: 14px; font-weight: 600; margin-bottom: 2px; }
+  .hotel-card-loc { font-size: 11px; color: var(--gray-400); }
+  .hotel-card-badge {
+    font-size: 10px; padding: 3px 8px; border-radius: 12px; font-weight: 500;
+  }
+  .badge-ok { background: #D1FAE5; color: #065F46; }
+  .badge-warn { background: #FEF3C7; color: #92400E; }
+  .hotel-card-dates {
+    padding: 0 1rem 0.75rem;
+    display: flex; gap: 16px;
+    font-size: 11px; color: var(--gray-600);
+    border-top: 1px solid var(--gray-100);
+    padding-top: 0.625rem;
+    margin-top: 0;
+  }
+  .hotel-dates-item { display: flex; flex-direction: column; gap: 2px; }
+  .hotel-dates-label { font-size: 9px; color: var(--gray-400); text-transform: uppercase; letter-spacing: 0.05em; }
+  .hotel-dates-val { font-size: 12px; font-weight: 500; }
+  .hotel-note {
+    margin: 0 1rem 0.75rem;
+    padding: 0.5rem 0.75rem;
+    background: #FFF0F0; border-right: 3px solid var(--red);
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 11px; color: var(--red-dark);
+  }
+
+  /* Flight card */
+  .flight-card {
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+    margin: 0 1rem 10px;
+  }
+  .flight-header {
+    background: var(--red); color: white;
+    padding: 0.625rem 1rem;
+    display: flex; justify-content: space-between; align-items: center;
+  }
+  .flight-label { font-size: 10px; opacity: 0.8; }
+  .flight-airline { font-size: 12px; font-weight: 600; }
+  .flight-row {
+    padding: 1rem;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .flight-city { text-align: center; }
+  .flight-iata { font-size: 22px; font-weight: 700; color: var(--gray-800); }
+  .flight-name { font-size: 10px; color: var(--gray-400); margin-top: 2px; }
+  .flight-time { font-size: 13px; font-weight: 600; margin-top: 4px; }
+  .flight-arrow { display: flex; flex-direction: column; align-items: center; gap: 4px; flex: 1; }
+  .flight-line { height: 1px; width: 100%; background: var(--gray-200); position: relative; }
+  .flight-plane { font-size: 16px; transform: rotate(180deg); }
+  .flight-duration { font-size: 10px; color: var(--gray-400); }
+
+  /* ====== CURRENCY ====== */
+  .currency-hero {
+    background: var(--red); padding: 1.5rem 1.25rem 1.25rem;
+    position: relative; overflow: hidden;
+  }
+  .currency-hero::after {
+    content: 'PLN'; position: absolute; right: -10px; bottom: -10px;
+    font-size: 80px; font-weight: 700; color: rgba(255,255,255,0.08); line-height: 1;
+  }
+  .currency-label { color: rgba(255,255,255,0.75); font-size: 12px; margin-bottom: 6px; }
+  .currency-rate { color: white; font-size: 32px; font-weight: 700; }
+  .currency-sub { color: rgba(255,255,255,0.65); font-size: 12px; margin-top: 4px; }
+
+  .converter-box {
+    margin: 1rem; background: var(--white);
+    border-radius: var(--radius); padding: 1rem 1.25rem;
+    box-shadow: var(--shadow-card); border: 1px solid var(--gray-200);
+  }
+  .converter-label { font-size: 11px; color: var(--gray-400); margin-bottom: 8px; }
+  .converter-inputs { display: flex; align-items: center; gap: 10px; }
+  .conv-input-wrap { flex: 1; }
+  .conv-currency { font-size: 10px; color: var(--gray-400); margin-bottom: 4px; }
+  .conv-input {
+    width: 100%; border: 1px solid var(--gray-200); border-radius: var(--radius-sm);
+    padding: 0.625rem 0.75rem; font-size: 18px; font-weight: 600;
+    font-family: var(--font); direction: ltr; text-align: right;
+    background: var(--gray-100); color: var(--gray-800);
+  }
+  .conv-input:focus { outline: none; border-color: var(--red); background: white; }
+  .conv-arrow { font-size: 18px; color: var(--gray-400); margin-top: 18px; }
+
+  .prices-grid { padding: 0 1rem; display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+  .price-card {
+    background: var(--white); border-radius: var(--radius);
+    padding: 0.875rem; box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+  }
+  .price-emoji { font-size: 20px; margin-bottom: 6px; }
+  .price-item { font-size: 11px; color: var(--gray-600); margin-bottom: 2px; }
+  .price-val { font-size: 13px; font-weight: 600; color: var(--gray-800); }
+
+  /* ====== TRIVIA GAME ====== */
+  .game-header {
+    background: var(--red); padding: 1.5rem 1.25rem 1.25rem;
+    color: white;
+  }
+  .game-header-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .game-header-sub { font-size: 12px; opacity: 0.75; }
+  .game-score-bar {
+    display: flex; gap: 12px; margin-top: 12px;
+  }
+  .game-score-item { text-align: center; }
+  .game-score-num { font-size: 20px; font-weight: 700; line-height: 1; }
+  .game-score-label { font-size: 9px; opacity: 0.7; margin-top: 2px; }
+
+  .question-card {
+    margin: 1rem; background: var(--white);
+    border-radius: var(--radius); padding: 1.25rem;
+    box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+  }
+  .q-num { font-size: 10px; color: var(--gray-400); margin-bottom: 8px; }
+  .q-text { font-size: 15px; font-weight: 600; line-height: 1.4; margin-bottom: 1rem; }
+  .q-options { display: flex; flex-direction: column; gap: 8px; }
+  .q-option {
+    border: 1.5px solid var(--gray-200); border-radius: var(--radius-sm);
+    padding: 0.75rem 1rem; font-size: 13px; cursor: pointer;
+    transition: all 0.15s; background: var(--white); text-align: right;
+    font-family: var(--font);
+  }
+  .q-option:hover { border-color: var(--red); background: #FFF0F0; }
+  .q-option.correct { background: #D1FAE5; border-color: #10B981; color: #065F46; }
+  .q-option.wrong { background: #FEE2E2; border-color: #EF4444; color: #991B1B; }
+  .q-option.disabled { pointer-events: none; }
+
+  .q-fact {
+    margin-top: 1rem; padding: 0.75rem;
+    background: #F0FDF4; border-right: 3px solid #10B981;
+    border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+    font-size: 12px; color: #065F46; line-height: 1.5;
+    display: none;
+  }
+  .q-next-btn {
+    margin-top: 1rem; width: 100%;
+    background: var(--red); color: white; border: none;
+    border-radius: var(--radius-sm); padding: 0.75rem;
+    font-size: 14px; font-weight: 600; cursor: pointer;
+    font-family: var(--font); display: none;
+  }
+  .q-next-btn:active { opacity: 0.85; }
+
+  .game-progress {
+    margin: 0 1rem; height: 4px;
+    background: var(--gray-200); border-radius: 2px; overflow: hidden;
+  }
+  .game-progress-fill {
+    height: 100%; background: var(--red);
+    border-radius: 2px; transition: width 0.4s ease;
+  }
+
+  .game-over {
+    margin: 1rem; background: var(--white);
+    border-radius: var(--radius); padding: 2rem 1.25rem;
+    box-shadow: var(--shadow); border: 1px solid var(--gray-200);
+    text-align: center; display: none;
+  }
+  .game-over-emoji { font-size: 64px; margin-bottom: 12px; }
+  .game-over-title { font-size: 20px; font-weight: 700; margin-bottom: 6px; }
+  .game-over-score { font-size: 32px; font-weight: 700; color: var(--red); margin-bottom: 8px; }
+  .game-over-sub { font-size: 13px; color: var(--gray-600); margin-bottom: 1.5rem; }
+  .game-restart {
+    background: var(--red); color: white; border: none;
+    border-radius: var(--radius-sm); padding: 0.875rem 2rem;
+    font-size: 14px; font-weight: 600; cursor: pointer; font-family: var(--font);
+  }
+
+  /* ====== EMERGENCY ====== */
+  .emergency-hero {
+    background: #1C1C1E; padding: 1.5rem 1.25rem 1.25rem;
+    color: white;
+  }
+  .emergency-title { font-size: 22px; font-weight: 700; margin-bottom: 4px; }
+  .emergency-sub { font-size: 12px; color: rgba(255,255,255,0.6); }
+
+  .emergency-list { padding: 0 1rem; display: flex; flex-direction: column; gap: 8px; }
+  .emergency-card {
+    background: var(--white); border-radius: var(--radius);
+    overflow: hidden; box-shadow: var(--shadow-card);
+    border: 1px solid var(--gray-200);
+  }
+  .emergency-section-label {
+    background: var(--gray-100); padding: 0.4rem 1rem;
+    font-size: 10px; color: var(--gray-400); font-weight: 600; letter-spacing: 0.06em; text-transform: uppercase;
+  }
+  .emergency-item {
+    display: flex; align-items: center; gap: 12px;
+    padding: 0.75rem 1rem; border-bottom: 1px solid var(--gray-100);
+    cursor: pointer; text-decoration: none; color: inherit;
+  }
+  .emergency-item:last-child { border-bottom: none; }
+  .emergency-icon {
+    width: 38px; height: 38px; border-radius: 10px;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 18px; flex-shrink: 0;
+  }
+  .emergency-text { flex: 1; }
+  .emergency-name { font-size: 13px; font-weight: 500; }
+  .emergency-number { font-size: 11px; color: var(--gray-400); direction: ltr; margin-top: 1px; }
+  .emergency-call { font-size: 11px; color: var(--red); font-weight: 600; }
+
+  /* ====== UTILS ====== */
+  .section-header {
+    padding: 1.25rem 1.25rem 0.75rem;
+    display: flex; align-items: baseline; justify-content: space-between;
+  }
+  .section-header-title { font-size: 18px; font-weight: 700; }
+  .section-header-sub { font-size: 11px; color: var(--gray-400); }
+  .divider { height: 1px; background: var(--gray-200); margin: 0 1rem 0; }
+</style>
+</head>
+<body>
+
+<!-- ==================== HOME ==================== -->
+<section class="screen active" id="screen-home">
+  <div class="hero">
+    <div class="hero-bg"></div>
+    <div class="hero-pattern"></div>
+    <div class="hero-eagle">🦅</div>
+    <div class="hero-content">
+      <div class="hero-flag">🇵🇱</div>
+      <div class="hero-title">טיול משפחתי<br>לפולין 2026</div>
+      <div class="hero-subtitle">13–26 יולי · 14 ימים · 5 אזורים · משפחת ארבל</div>
+    </div>
+    <div class="countdown-bar">
+      <div class="countdown-label">⏳ ספירה לאחור ליציאה</div>
+      <div class="countdown-numbers">
+        <div class="cd-item"><span class="cd-num" id="cd-days">--</span><span class="cd-unit">ימים</span></div>
+        <div class="cd-item"><span class="cd-num" id="cd-hours">--</span><span class="cd-unit">שעות</span></div>
+        <div class="cd-item"><span class="cd-num" id="cd-mins">--</span><span class="cd-unit">דקות</span></div>
+        <div class="cd-item"><span class="cd-num" id="cd-secs">--</span><span class="cd-unit">שניות</span></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- WEATHER + QUICK CARDS -->
+  <div class="section-title">מזג אוויר ומידע</div>
+  <div class="quick-grid">
+    <div class="quick-card" id="weather-today" onclick="fetchWeather()" style="cursor:pointer;">
+      <div class="qc-icon" id="wx-icon-today">🌡️</div>
+      <div class="qc-label" id="wx-label-today">מזג אוויר היום</div>
+      <div class="qc-value" id="wx-val-today">טוען...</div>
+    </div>
+    <div class="quick-card" id="weather-tomorrow" onclick="fetchWeather()" style="cursor:pointer;">
+      <div class="qc-icon" id="wx-icon-tmrw">🌤️</div>
+      <div class="qc-label" id="wx-label-tmrw">מחר</div>
+      <div class="qc-value" id="wx-val-tmrw">טוען...</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">💵</div>
+      <div class="qc-label">מטבע</div>
+      <div class="qc-value">זלוטי (PLN)</div>
+    </div>
+    <div class="quick-card">
+      <div class="qc-icon">📍</div>
+      <div class="qc-label">עצירות</div>
+      <div class="qc-value">5 אזורים</div>
+    </div>
+  </div>
+
+  <!-- FLIGHTS -->
+  <div class="divider" style="margin-top:8px;"></div>
+  <div class="section-title">✈️ הטיסות שלנו — SUNDOR / EL AL</div>
+
+  <!-- Outbound -->
+  <div class="flight-card" style="margin: 0 1rem 10px;">
+    <div class="flight-header">
+      <div><div class="flight-label">✈️ טיסת יציאה · LY5101</div><div class="flight-airline">EL AL / SUNDOR · קוד הזמנה: ZRCJ4O</div></div>
+      <div style="color:rgba(255,255,255,0.85); font-size:12px; font-weight:600;">13 יולי</div>
+    </div>
+    <div class="flight-row">
+      <div class="flight-city">
+        <div class="flight-iata">TLV</div>
+        <div class="flight-name">בן גוריון</div>
+        <div class="flight-time">17:30</div>
+      </div>
+      <div class="flight-arrow">
+        <div class="flight-plane">✈️</div>
+        <div class="flight-line"></div>
+        <div class="flight-duration">4:00 שעות · טרמינל 3</div>
+      </div>
+      <div class="flight-city">
+        <div class="flight-iata">WAW</div>
+        <div class="flight-name">ורשה שופן</div>
+        <div class="flight-time">20:30</div>
+      </div>
+    </div>
+    <div style="padding: 0 1rem 0.75rem; font-size:11px; color:var(--gray-400); border-top:1px solid var(--gray-100); padding-top:0.5rem; margin-top:-2px;">
+      👨‍👩‍👧‍👦 דרור · ליאת · יהליאור · מיאל אדר · מיה אמור &nbsp;|&nbsp; 🧳 ידנית בלבד (0PC)
+    </div>
+  </div>
+
+  <!-- Return -->
+  <div class="flight-card" style="margin: 0 1rem 1rem;">
+    <div class="flight-header" style="background:#374151;">
+      <div><div class="flight-label">🏠 טיסת חזרה · LY5102</div><div class="flight-airline">EL AL / SUNDOR · קוד הזמנה: ZRCJ4O</div></div>
+      <div style="color:rgba(255,255,255,0.85); font-size:12px; font-weight:600;">26 יולי</div>
+    </div>
+    <div class="flight-row">
+      <div class="flight-city">
+        <div class="flight-iata">WAW</div>
+        <div class="flight-name">ורשה שופן</div>
+        <div class="flight-time">10:05</div>
+      </div>
+      <div class="flight-arrow">
+        <div class="flight-plane" style="transform:none;">✈️</div>
+        <div class="flight-line"></div>
+        <div class="flight-duration">3:50 שעות · טרמינל 3</div>
+      </div>
+      <div class="flight-city">
+        <div class="flight-iata">TLV</div>
+        <div class="flight-name">בן גוריון</div>
+        <div class="flight-time">14:55</div>
+      </div>
+    </div>
+    <div style="padding: 0 1rem 0.75rem; font-size:11px; color:var(--gray-400); border-top:1px solid var(--gray-100); padding-top:0.5rem; margin-top:-2px;">
+      👨‍👩‍👧‍👦 דרור · ליאת · יהליאור · מיאל אדר · מיה אמור &nbsp;|&nbsp; 🧳 ידנית בלבד (0PC)
+    </div>
+  </div>
+
+  <!-- CAR RENTAL -->
+  <div class="divider"></div>
+  <div class="section-title">🚗 רכב שכור — Budget Poland</div>
+  <div style="margin: 0 1rem 1rem; background:var(--white); border-radius:var(--radius); overflow:hidden; box-shadow:var(--shadow-card); border:1px solid var(--gray-200);">
+    <div style="background:#F59E0B; padding:0.625rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+      <div style="color:white; font-size:12px; font-weight:600;">Ofran Prepaid Voucher · שובר 45184313</div>
+      <a href="https://www.ofran.co.il" target="_blank" style="color:white; font-size:10px; text-decoration:underline;">אתר אופרן</a>
+    </div>
+    <div style="padding:0.875rem 1rem; display:grid; grid-template-columns:1fr 1fr; gap:10px;">
+      <div>
+        <div style="font-size:9px; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:3px;">🟢 לקיחה</div>
+        <div style="font-size:13px; font-weight:600;">14 יולי · 10:00</div>
+        <div style="font-size:11px; color:var(--gray-600); margin-top:2px;">Warsaw Chopin Airport</div>
+        <a href="https://waze.com/ul?q=Warsaw+Chopin+Airport&navigate=yes" target="_blank" style="font-size:10px; color:#00AAFF; text-decoration:none; margin-top:2px; display:block;">🗺️ Waze</a>
+        <a href="tel:+48601334285" style="font-size:10px; color:var(--red); text-decoration:none; margin-top:2px; display:block;">📞 +48-601334285</a>
+      </div>
+      <div>
+        <div style="font-size:9px; color:var(--gray-400); text-transform:uppercase; letter-spacing:0.05em; margin-bottom:3px;">🔴 החזרה</div>
+        <div style="font-size:13px; font-weight:600;">24 יולי · 10:00</div>
+        <div style="font-size:11px; color:var(--gray-600); margin-top:2px;">Warsaw Marriott Hotel</div>
+        <a href="https://waze.com/ul?q=Warsaw+Marriott+Hotel+Jerozolimskie&navigate=yes" target="_blank" style="font-size:10px; color:#00AAFF; text-decoration:none; margin-top:2px; display:block;">🗺️ Waze</a>
+        <a href="tel:+48601332889" style="font-size:10px; color:var(--red); text-decoration:none; margin-top:2px; display:block;">📞 +48-601332889</a>
+      </div>
+    </div>
+    <div style="padding:0 1rem 0.75rem; display:flex; gap:8px; flex-wrap:wrap;">
+      <span style="background:var(--gray-100); border-radius:20px; padding:3px 10px; font-size:10px; color:var(--gray-600);">🚙 Kia Sportage אוטומטי</span>
+      <span style="background:var(--gray-100); border-radius:20px; padding:3px 10px; font-size:10px; color:var(--gray-600);">📅 10 ימים</span>
+      <span style="background:#D1FAE5; border-radius:20px; padding:3px 10px; font-size:10px; color:#065F46;">✓ Super CDW כלול</span>
+      <span style="background:#D1FAE5; border-radius:20px; padding:3px 10px; font-size:10px; color:#065F46;">✓ ק"מ ללא הגבלה</span>
+    </div>
+    <div style="margin:0 1rem 0.75rem; padding:0.5rem 0.75rem; background:#FFF0F0; border-right:3px solid var(--red); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:11px; color:var(--red-dark);">
+      ⚠️ חובה להדפיס את השובר! לא ניתן להציג בנייד. הביאו גם רישיון נהיגה ישראלי + בינלאומי + דרכון + כרטיס אשראי פיזי.
+    </div>
+  </div>
+
+  <!-- EDITABLE REMINDERS -->
+  <div class="divider"></div>
+  <div style="display:flex; align-items:center; justify-content:space-between; padding: 1.25rem 1.25rem 0.5rem;">
+    <div class="section-title" style="padding:0;">⚠️ תזכורות חשובות</div>
+    <button onclick="addReminder()" style="background:var(--red); color:white; border:none; border-radius:20px; padding:4px 12px; font-size:11px; font-weight:600; cursor:pointer; font-family:var(--font);">+ הוסף</button>
+  </div>
+  <div id="reminders-list" style="padding:0 1rem 0.5rem; display:flex; flex-direction:column; gap:8px;"></div>
+
+  <!-- DOCUMENTS -->
+  <div class="divider" style="margin-top:4px;"></div>
+  <div style="display:flex; align-items:center; justify-content:space-between; padding: 0 1.25rem 0.5rem; margin-top:4px;">
+    <div style="font-size:13px; font-weight:600; color:var(--gray-600); letter-spacing:0.05em; text-transform:uppercase;">📁 מסמכים חשובים</div>
+    <a href="https://drive.google.com/drive/folders/1JK92GoFjB7RE8KtUBkLfkjSfEx16lPRe?usp=drive_link" target="_blank"
+       style="background:#1967D2; color:white; border-radius:20px; padding:5px 12px; font-size:11px; font-weight:600; text-decoration:none; display:flex; align-items:center; gap:5px; flex-shrink:0;">
+      📂 Google Drive
+    </a>
+  </div>
+  <div style="padding:0 1rem 1rem; display:flex; flex-direction:column; gap:8px;">
+
+    <!-- Flights -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">✈️ טיסות</div>
+      <div class="emergency-item" style="cursor:default;">
+        <div class="emergency-icon" style="background:#FEE2E2; font-size:18px;">📄</div>
+        <div class="emergency-text"><div class="emergency-name">כרטיסי טיסה — LY5101 / LY5102</div><div class="emergency-number">ZRCJ4O · SUNDOR / EL AL · 5 נוסעים</div></div>
+        <div style="font-size:10px; color:#10B981; font-weight:600;">✓ OK</div>
+      </div>
+    </div>
+
+    <!-- Car -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">🚗 רכב</div>
+      <div class="emergency-item" style="cursor:default;">
+        <div class="emergency-icon" style="background:#FEF3C7; font-size:18px;">📄</div>
+        <div class="emergency-text"><div class="emergency-name">שובר Ofran · Budget Poland</div><div class="emergency-number">שובר 45184313 · אישור 48934211IL4</div></div>
+        <div style="font-size:10px; color:#F59E0B; font-weight:600;">🖨️ הדפס!</div>
+      </div>
+    </div>
+
+    <!-- Passports -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">🛂 דרכונים — כולם בתוקף ✅</div>
+      <div style="padding:0.5rem 1rem; display:flex; flex-direction:column; gap:0;">
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">👨 דרור</div>
+          <div style="font-size:11px; color:var(--gray-600);">34199501 · עד 10/12/2029</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">👩 ליאת</div>
+          <div style="font-size:11px; color:var(--gray-600);">34671446 · עד 23/02/2031</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">🧒 יהליאור</div>
+          <div style="font-size:11px; color:var(--gray-600);">36791551 · עד 24/12/2027</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0; border-bottom:1px solid var(--gray-100);">
+          <div style="font-size:12px; font-weight:600;">🧒 מיאל אדר</div>
+          <div style="font-size:11px; color:var(--gray-600);">36791335 · עד 24/12/2027</div>
+        </div>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:6px; padding:0.5rem 0;">
+          <div style="font-size:12px; font-weight:600;">👧 מיה אמור</div>
+          <div style="font-size:11px; color:var(--gray-600);">36796116 · עד 24/12/2027</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Driving License -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:#D1FAE5; padding:0.4rem 1rem; font-size:10px; color:#065F46; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">🪪 רישיון נהיגה — דרור ✅</div>
+      <div class="emergency-item" style="cursor:default;">
+        <div class="emergency-icon" style="background:#D1FAE5; font-size:18px;">✅</div>
+        <div class="emergency-text"><div class="emergency-name">רישיון ישראלי — 8189982</div><div class="emergency-number">תוקף עד 06/01/2027 · B C1</div></div>
+        <div style="font-size:10px; color:#10B981; font-weight:600;">בתוקף</div>
+      </div>
+      <div class="emergency-item" style="cursor:default; border-top:1px solid var(--gray-100);">
+        <div class="emergency-icon" style="background:#D1FAE5; font-size:18px;">✅</div>
+        <div class="emergency-text">
+          <div class="emergency-name">רישיון בינלאומי — 82541247</div>
+          <div class="emergency-number">תוקף עד 05/01/2027 · הונפק 11/07/2025</div>
+        </div>
+        <div style="font-size:10px; color:#10B981; font-weight:600;">בתוקף!</div>
+      </div>
+    </div>
+
+    <!-- Credit Cards -->
+    <div style="background:var(--white); border-radius:var(--radius); border:1px solid var(--gray-200); overflow:hidden; box-shadow:var(--shadow-card);">
+      <div style="background:var(--gray-100); padding:0.4rem 1rem; font-size:10px; color:var(--gray-400); font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">💳 כרטיסי אשראי — פיזי בלבד!</div>
+      <div style="padding:0.5rem 1rem 0.75rem; display:flex; flex-direction:column; gap:6px;">
+        <div style="font-size:10px; color:var(--gray-400); font-weight:600; margin-bottom:2px;">👨 דרור</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">Visa HTZ ...1282</span>
+          <span style="font-size:10px; background:#D1FAE5; color:#065F46; border-radius:12px; padding:2px 8px;">✓ 01/26</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">MAX Mastercard ...4697</span>
+          <span style="font-size:10px; background:#FEF3C7; color:#92400E; border-radius:12px; padding:2px 8px;">⚠️ 07/25</span>
+        </div>
+        <div style="border-top:1px solid var(--gray-100); margin-top:4px; padding-top:6px; font-size:10px; color:var(--gray-400); font-weight:600; margin-bottom:2px;">👩 ליאת</div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">Visa HTZ ...2561</span>
+          <span style="font-size:10px; background:#D1FAE5; color:#065F46; border-radius:12px; padding:2px 8px;">✓ 01/26</span>
+        </div>
+        <div style="display:flex; align-items:center; gap:8px;">
+          <span style="font-size:13px;">💳</span>
+          <span style="font-size:12px; flex:1;">MAX Mastercard ...5193</span>
+          <span style="font-size:10px; background:#D1FAE5; color:#065F46; border-radius:12px; padding:2px 8px;">✓ בתוקף</span>
+        </div>
+        <div style="margin-top:6px; padding:0.5rem 0.75rem; background:#FFF0F0; border-right:3px solid var(--red); border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:11px; color:var(--red-dark);">
+          ⚠️ Budget לא מקבל Apple Pay / Google Pay — חובה כרטיס פיזי!
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== ITINERARY ==================== -->
+<section class="screen" id="screen-itin">
+  <div class="section-header">
+    <div class="section-header-title">לוח הטיול</div>
+    <div class="section-header-sub">14 ימים</div>
+  </div>
+
+  <!-- Day 1 -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge"><div class="itin-date-num">13</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">יום 1 — הגעה לוורשה ✈️</div>
+        <div class="itin-day-sub">TLV 17:30 → Warsaw 20:30 · LY5101</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEE2E2;">✈️</div>
+        <div class="stop-text">
+          <div class="stop-name">נחיתה בוורשה — 20:30</div>
+          <div class="stop-desc">נחיתה בשדה התעופה וורשה שופן. צ'ק-אין ב-Airport Hotel Okęcie — ממש ליד השדה, ~5 דקות נסיעה.</div>
+          <div class="stop-time">🌙 הגעה צפויה ~21:30 למלון</div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#E0F2FE;">📱</div>
+        <div class="stop-text">
+          <div class="stop-name">⚡ סים פולני + טלפונים</div>
+          <div class="stop-desc">בשדה התעופה יש דוכני Play / Orange / T-Mobile — SIM פולני עולה ~20-30 PLN ל-10-15GB. קנו אחד לפחות לניווט GPS בלי לשרוף את הרוaming. אקטיבו והגדירו לפני יציאה מהשדה.</div>
+          <div class="stop-time">📍 דוכנים בצאת ה-Arrivals</div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF3C7;">🛒</div>
+        <div class="stop-text">
+          <div class="stop-name">Check-in + מנוחה</div>
+          <div class="stop-desc">Check-in מ-15:00 (הגעה מאוחרת — וודאו שמחכים לכם). ארוחת ערב קלה ושינה. רכב נאסוף מחר בבוקר.</div>
+          <div class="stop-time">🌙 לינה שקטה לפני הרפתקה</div>
+        </div>
+      </div>
+      <div class="hotel-strip">
+        <span class="hotel-strip-icon">🏨</span>
+        <div class="hotel-strip-text">
+          <span class="hotel-strip-name">Airport Hotel Okęcie</span>
+          <span class="hotel-strip-note"> · Check-in מ-15:00 · הגעה ~22:00-23:00 · אישור 6812.601.622 · </span>
+          <a href="tel:+48224568000" style="color:var(--red); text-decoration:none; font-size:11px;">📞 +48 22 456 80 00</a> &nbsp; <a href="https://waze.com/ul?q=Airport+Hotel+Okecie+Warsaw&navigate=yes" target="_blank" style="color:#00AAFF; font-size:11px; text-decoration:none;">🗺️ Waze</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 2 -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge"><div class="itin-date-num">14</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">יום 2 — נסיעה לטורון 🚗</div>
+        <div class="itin-day-sub">Warsaw → Płock → Toruń · ~210 ק"מ · ~2:30 שעות</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF3C7;">🚗</div>
+        <div class="stop-text">
+          <div class="stop-name">איסוף רכב — Budget Poland</div>
+          <div class="stop-desc">Warsaw Chopin Airport · 10:00 · חובה שובר מודפס + רישיון ישראלי + בינלאומי + דרכון + כרטיס אשראי פיזי!</div>
+          <div class="stop-time">📍 ul. Żwirki i Wigury 1 · <a href="tel:+48601334285" style="color:var(--red);">📞 +48-601334285</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#E8F5E9;">🏛️</div>
+        <div class="stop-text">
+          <div class="stop-name">עצירה בדרך — פלוצק (Płock)</div>
+          <div class="stop-desc">עיר עתיקה על נהר הוויסלה בדרך לטורון — טיילת יפה והעיר העתיקה. עצירה קצרה של חצי שעה לרגליים.</div>
+          <div class="stop-time">🌤️ בדרך · <a href="https://www.google.com/maps/place/Płock" target="_blank" style="color:var(--red);">📍 מפות</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF3C7;">🍪</div>
+        <div class="stop-text">
+          <div class="stop-name">הגעה לטורון — Check-in</div>
+          <div class="stop-desc">Hotel Spichrz · Check-in מ-14:00. ארוחת ערב ברחוב הראשי של העיר הגותית.</div>
+          <div class="stop-time">🌆 אחה"צ</div>
+        </div>
+      </div>
+      <div style="margin:0 1rem 0.75rem; padding:0.5rem 0.75rem; background:#1C1C2E; border-radius:var(--radius-sm); display:flex; align-items:center; gap:8px;">
+        <span style="font-size:18px;">⚽</span>
+        <div>
+          <div style="font-size:11px; font-weight:600; color:white;">מונדיאל — רבע גמר 9–12/7 · לפני הטיול!</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.7);">צפו מהבית · חצי גמר 14–15/7 בקשוביה</div>
+        </div>
+      </div>
+      <div class="hotel-strip">
+        <span class="hotel-strip-icon">🏨</span>
+        <div class="hotel-strip-text">
+          <span class="hotel-strip-name">Hotel Spichrz, Toruń</span>
+          <span class="hotel-strip-note"> · Check-in מ-14:00 · Check-out עד 12:00 · אישור 6091.884.860 · </span>
+          <a href="tel:+48566571140" style="color:var(--red); text-decoration:none; font-size:11px;">📞 +48 56 657 11 40</a> &nbsp; <a href="https://waze.com/ul?q=Hotel+Spichrz+Torun+Mostowa&navigate=yes" target="_blank" style="color:#00AAFF; font-size:11px; text-decoration:none;">🗺️ Waze</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 3 -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge"><div class="itin-date-num">15</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">יום 3 — טורון → Malbork → קשוביה 🍪🏰</div>
+        <div class="itin-day-sub">Toruń → Malbork → Bydgoszcz → Stare Czaple · ~3 שעות</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF3C7;">🏰</div>
+        <div class="stop-text">
+          <div class="stop-name">🏰 Malbork Castle — חובה!</div>
+          <div class="stop-desc">אחת הטירות הגותיות המרשימות באירופה — UNESCO. בדרך מטורון לקשוביה, רק ~30 ק"מ מהמסלול. 3-4 שעות. הזמינו כרטיסים מראש!</div>
+          <div class="stop-time">☀️ בוקר-צהריים · <a href="https://bilety.zamek.malbork.pl/?lang=en" target="_blank" style="color:var(--red);">🎫 כרטיסים</a> · <a href="https://waze.com/ul?q=Malbork+Castle+Poland&navigate=yes" target="_blank" style="color:#00AAFF;">🗺️ Waze</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#D1FAE5;">🍪</div>
+        <div class="stop-text">
+          <div class="stop-name">מוזיאון הג'ינג'ר ברד (Żywe Muzeum Piernika)</div>
+          <div class="stop-desc">גוגל 4.6 ⭐ · 13,600 ביקורות! ילדים נפגשים עם "מאסטר האפייה" ומכינים בעצמם עוגיות תבלין. סדנת אפייה + קנייה לבית.</div>
+          <div class="stop-time">🌤️ צהריים · <a href="https://muzeum.torun.pl" target="_blank" style="color:var(--red);">🌐 אתר</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#E0F2FE;">⛸️</div>
+        <div class="stop-text">
+          <div class="stop-name">⛸️ Torbyd — מגרש החלקה בבידגושץ' (Bydgoszcz)</div>
+          <div class="stop-desc">פועל ההיכל הקרח המשוכלל Torbyd — פתוח לאורך כל השנה! מציע החלקה משפחתית מהנה על מצח אולימפי. ~40 דקות נסיעה מטורון בדרך לקשוביה.</div>
+          <div class="stop-time">🌆 אחה"צ · <a href="https://www.google.com/maps/search/Torbyd+Bydgoszcz" target="_blank" style="color:var(--red);">📍 מפות</a></div>
+        </div>
+      </div>
+      <div class="hotel-strip">
+        <span class="hotel-strip-icon">🚗</span>
+        <div class="hotel-strip-text">
+          <span class="hotel-strip-name">→ Kaszubska Nirvana, Stare Czaple</span>
+          <span class="hotel-strip-note"> · Check-in 16:00–20:00 · ⚠️ PLN 500 מזומן!</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Days 4-5 -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge"><div class="itin-date-num">16-17</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">ימים 4–5 — קשוביה 🌊</div>
+        <div class="itin-day-sub">Stare Czaple · טבע, אגמות, הרפתקות</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#E0F2FE;">🛶</div>
+        <div class="stop-text">
+          <div class="stop-name">קיאקינג + שחייה באגמות</div>
+          <div class="stop-desc">1,800 אגמות בין יערות אורן. Spływy Kajokowe (4.9⭐) ליד הצימר — קיאקינג, שחייה, טיולי יער. גם אגם Gilwa עם ספורט מים ו-Flying Fox.</div>
+          <div class="stop-time">🌿 יום שלם · <a href="https://www.google.com/maps/search/Spływy+Kajokowe+Stare+Czaple" target="_blank" style="color:var(--red);">📍 Spływy Kajokowe</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF9C3;">🏠</div>
+        <div class="stop-text">
+          <div class="stop-name">סימברק (Szymbark) — "הבית ההפוך"</div>
+          <div class="stop-desc">אחד הדברים הכי מוזרים וכיפיים בפולין! בית שנבנה הפוך עם הגג למטה — ילדים מתגלגלים מצחוק. גם לוח הארוך בעולם ומשק מסורתי. ~30 דקות מהצימר.</div>
+          <div class="stop-time">☀️ חצי יום · <a href="https://www.google.com/maps/place/Szymbark+Kaszuby" target="_blank" style="color:var(--red);">📍 מפות</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF3C7;">🐴</div>
+        <div class="stop-text">
+          <div class="stop-name">רכיבה על סוסים — Stadnina Koni Kolano</div>
+          <div class="stop-desc">חוות סוסים ביותר באזור. רכיבה משפחתית בדרכים סגורות, מתאים לילדים גילאי 10-14. אפשר גם שיעורי הנהגה בגמגר. כדאי להזמין יום מראש.</div>
+          <div class="stop-time">🌤️ בוקר/אחה"צ · <a href="https://www.google.com/maps/search/Stadnina+Koni+Kolano+Kashubia" target="_blank" style="color:var(--red);">📍 מפות</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FFF9C4;">💛</div>
+        <div class="stop-text">
+          <div class="stop-name">🏆 "חיפוש זהב" — ענברים בגדנסק (Gdańsk)</div>
+          <div class="stop-desc">מכרה הזהב הרשמי של פולין ובעולם — הענברים (Amber) הם המכונים "הזהב הצפוני". תוכלו לקחת חצי יום לגדנסק (~שעה) לחיפוש ענברים בחוף, ולהגיע למרכז ההיסטורי היפה. Kayaks מצויינים מקומית גם כן.</div>
+          <div class="stop-time">🌆 יום טיול · <a href="https://www.google.com/maps/place/Gdańsk" target="_blank" style="color:var(--red);">📍 גדנסק</a></div>
+        </div>
+      </div>
+      <div style="margin:0 1rem 0.75rem; padding:0.5rem 0.75rem; background:#7C3AED; border-radius:var(--radius-sm); display:flex; align-items:center; gap:8px;">
+        <span style="font-size:18px;">⚽</span>
+        <div>
+          <div style="font-size:11px; font-weight:600; color:white;">מונדיאל — חצי גמר 14/7 ו-15/7 · 21:00</div>
+          <div style="font-size:10px; color:rgba(255,255,255,0.7);">Spływy Kajokowe (4.9⭐ · ליד הצימר) · או Pub בגדנסק</div>
+        </div>
+      </div>
+      <div class="hotel-strip">
+        <span class="hotel-strip-icon">🏡</span>
+        <div class="hotel-strip-text">
+          <span class="hotel-strip-name">Kaszubska Nirvana</span>
+          <span class="hotel-strip-note" style="color:#C0001C;"> · Check-in 16:00–20:00 · Check-out 08:00–11:00 · ⚠️ PLN 500 מזומן! · אישור 5540.047.641 · </span>
+          <a href="tel:+48603096933" style="color:var(--red); text-decoration:none; font-size:11px;">📞 +48 603 096 933</a> &nbsp; <a href="https://waze.com/ul?q=Stare+Czaple+451+Kaszubska+Nirvana&navigate=yes" target="_blank" style="color:#00AAFF; font-size:11px; text-decoration:none;">🗺️ Waze</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Days 6-8 -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge"><div class="itin-date-num">18-22</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">ימים 6–8 — וורמיה 🏛️</div>
+        <div class="itin-day-sub">Kashubia → Gietrzwałd · ~180 ק"מ</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#F0FDF4;">🔭</div>
+        <div class="stop-text">
+          <div class="stop-name">פרומבורק — מקום קופרניקוס</div>
+          <div class="stop-desc">הקתדרלה שבה קופרניקוס גילה שהכדור הארץ סובב את השמש. מגדל תצפית.</div>
+          <div class="stop-time">⏱️ יום שלם · ~50 ק"מ מהמלון</div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF9C3;">🦅</div>
+        <div class="stop-text">
+          <div class="stop-name">שמורת גרומה</div>
+          <div class="stop-desc">יער ראשוני עם עדר ביזון + נשרים לבני זנב. צפרות ייחודית.</div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#EDE9FE;">🏙️</div>
+        <div class="stop-text">
+          <div class="stop-name">אולשטין</div>
+          <div class="stop-desc">עיר גותית נחמדה עם טירה, רחובות ישנים ואגם מקסים.</div>
+        </div>
+      </div>
+      <div class="hotel-strip">
+        <span class="hotel-strip-icon">🏨</span>
+        <div class="hotel-strip-text">
+          <span class="hotel-strip-name">Warmia Resort, Gietrzwałd</span>
+          <span class="hotel-strip-note" style="color:#C0001C;"> · Check-in 16:00–20:00 · Check-out 08:00–10:00 · ✍️ העברה בנקאית מראש! · אישור 5277.463.444 · </span>
+          <a href="tel:+48662122000" style="color:var(--red); text-decoration:none; font-size:11px;">📞 +48 662 122 000</a> &nbsp; <a href="https://waze.com/ul?q=Warmia+Resort+Gietrzwald+Aleja+Lipowa+13A&navigate=yes" target="_blank" style="color:#00AAFF; font-size:11px; text-decoration:none;">🗺️ Waze</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Days 9-10: Suntago -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge"><div class="itin-date-num">22-23</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">ימים 9–10 — Suntago 🌊</div>
+        <div class="itin-day-sub">Warmia Resort → Suntago · ~220 ק"מ · לילה אחד</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#E0F2FE;">🎢</div>
+        <div class="stop-text">
+          <div class="stop-name">Suntago Waterpark</div>
+          <div class="stop-desc">הפארק המים הגדול בפולין! 32 מגלשות, גלים מלאכותיים, בריכות פנים ואוטדור. כרטיסים — בקשו הנחה בקבלה (10% על יום ראשון, עד 50% על יום שני)!</div>
+          <div class="stop-time">🌊 יום כיף מלא · Check-out 22/7 01:00–11:00</div>
+        </div>
+      </div>
+      <div class="hotel-strip">
+        <span class="hotel-strip-icon">🏡</span>
+        <div class="hotel-strip-text">
+          <span class="hotel-strip-name">Suntago Village — Deluxe Bungalow</span>
+          <span class="hotel-strip-note"> · Check-in 16:00–23:30 · לילה אחד · אישור 6850.290.525 · </span>
+          <a href="tel:+48224644444" style="color:var(--red); text-decoration:none; font-size:11px;">📞 +48 22 464 44 44</a> &nbsp; <a href="https://waze.com/ul?q=Suntago+Village+Zukowska+57+Mszczonow&navigate=yes" target="_blank" style="color:#00AAFF; font-size:11px; text-decoration:none;">🗺️ Waze</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Days 11-13: Warsaw Novotel -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge"><div class="itin-date-num">23-25</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">ימים 11–13 — וורשה סיום 🛍️</div>
+        <div class="itin-day-sub">Suntago → Warsaw · 60 ק"מ בלבד · Check-in 23/7 מ-15:00 · 3 לילות</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF3C7;">📚</div>
+        <div class="stop-text">
+          <div class="stop-name">מוזיאון POLIN — יהדות פולין</div>
+          <div class="stop-desc">1,000 שנות היסטוריה יהודית בפולין. על אדמת גטו וורשה. מרגש ומחייב — <strong>זהו אינו מוזיאון חוויתי קלאסי אלא סיפור חיים</strong>. מתאים יותר לגילאי 12+.</div>
+          <div class="stop-time">⏱️ 3-4 שעות · <a href="https://polin.pl/en" target="_blank" style="color:var(--red);">🌐 polin.pl</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#F3E8FF;">🪞</div>
+        <div class="stop-text">
+          <div class="stop-name">World of Illusion — מוזיאון אשליות</div>
+          <div class="stop-desc">מוזיאון אינטראקטיבי עם חדרי אשליות אופטיות, מראות קסם ותצוגות מרהיבות — מושלם לצילומים עם הילדים! ממוקם בכיכר העיר העתיקה.</div>
+          <div class="stop-time">🌤️ חצי יום · <a href="https://www.google.com/maps/search/World+of+Illusion+Warsaw" target="_blank" style="color:var(--red);">📍 מפות</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#E0F2FE;">🏙️</div>
+        <div class="stop-text">
+          <div class="stop-name">שכונת פראגה (Praga) + חומת הגטו</div>
+          <div class="stop-desc">השכונה האמנותית של ורשה — גרפיטי, גלריות, אווירה אותנטית. בדרך עוברים על שריד חומת הגטו ברחוב Sienna/Złota — נקודה היסטורית חשובה.</div>
+          <div class="stop-time">🌆 אחה"צ · <a href="https://www.google.com/maps/place/Praga+Warsaw" target="_blank" style="color:var(--red);">📍 פראגה</a></div>
+        </div>
+      </div>
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#FEF9C3;">🛍️</div>
+        <div class="stop-text">
+          <div class="stop-name">Złote Tarasy — קניון + ערב אחרון</div>
+          <div class="stop-desc">קניון ענק וחדיש ממש ליד הנובוטל — מזכרות, קניות אחרונות, ארוחת ערב עם כל הילדים. גם Nowy Świat לטיול ערב.</div>
+          <div class="stop-time">🌆 ערב · <a href="https://www.google.com/maps/place/Złote+Tarasy+Warsaw" target="_blank" style="color:var(--red);">📍 מפות</a></div>
+        </div>
+      </div>
+      <div class="hotel-strip">
+        <span class="hotel-strip-icon">🏨</span>
+        <div class="hotel-strip-text">
+          <span class="hotel-strip-name">Novotel Warszawa Centrum</span>
+          <span class="hotel-strip-note"> · Check-in 23/7 מ-15:00 · Check-out 26/7 עד 12:00 · 2 חדרים · 3 לילות · אישור 6545.276.701 · </span>
+          <a href="tel:+48225961325" style="color:var(--red); text-decoration:none; font-size:11px;">📞 +48 22 596 13 25</a> &nbsp; <a href="https://waze.com/ul?q=Novotel+Warszawa+Centrum+Marszalkowska&navigate=yes" target="_blank" style="color:#00AAFF; font-size:11px; text-decoration:none;">🗺️ Waze</a>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Day 14 -->
+  <div class="itin-day" onclick="toggleDay(this)">
+    <div class="itin-day-header">
+      <div class="itin-date-badge" style="background:#6B6966;"><div class="itin-date-num">26</div><div class="itin-date-mon">יולי</div></div>
+      <div class="itin-info">
+        <div class="itin-day-title">יום 14 — טיסה חזרה ✈️</div>
+        <div class="itin-day-sub">Warsaw → Tel Aviv</div>
+      </div>
+      <span class="itin-chevron">▾</span>
+    </div>
+    <div class="itin-body">
+      <div class="itin-stop">
+        <div class="stop-dot" style="background:#F3F4F6;">🚗</div>
+        <div class="stop-text">
+          <div class="stop-name">החזרת רכב + שדה תעופה</div>
+          <div class="stop-desc">החזרת Kia Sportage ב-Warsaw Marriott (10:00). נסיעה לשדה תעופה וטיסה חזרה 26/7!</div>
+          <div class="stop-time">שיהיה טיול מדהים! 🎉</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div style="height:1rem;"></div>
+</section>
+
+<!-- ==================== LOCATIONS ==================== -->
+<section class="screen" id="screen-locs">
+  <div class="section-header">
+    <div class="section-header-title">מדריך יעדים</div>
+    <div class="section-header-sub">5 אזורים</div>
+  </div>
+  <div class="loc-grid">
+
+    <div class="loc-card">
+      <div class="loc-banner" style="background: linear-gradient(135deg, #8B0013 0%, #C0001C 60%, #FF6B6B 100%);">
+        <div class="loc-banner-emoji">🏙️</div>
+        <div class="loc-banner-overlay"></div>
+        <div class="loc-banner-title">וורשה</div>
+        <div class="loc-banner-dates">13–15 יולי + 23–26 יולי</div>
+      </div>
+      <div class="loc-body">
+        <div class="loc-desc">עיר הפניקס — נהרסה לחלוטין במלחמת העולם ה-2 ונבנתה מחדש בר מקורי מדהים. בירת פולין שמשלבת היסטוריה כבדה עם אנרגיה מודרנית צעירה.</div>
+        <div class="loc-facts">
+          <span class="loc-fact">👥 1.8M תושבים</span>
+          <span class="loc-fact">🏛️ UNESCO</span>
+          <span class="loc-fact">🎹 עיר שופן</span>
+        </div>
+        <div class="loc-activities">
+          <a href="https://www.stare-miasto.com.pl" target="_blank" class="loc-activity">🏰 עיר עתיקה</a>
+          <a href="https://lazienki-krolewskie.pl/en" target="_blank" class="loc-activity">🎹 פארק ליזנקי</a>
+          <a href="https://www.kopernik.org.pl/en" target="_blank" class="loc-activity">⭐ מוזיאון קופרניקוס</a>
+          <a href="https://polin.pl/en" target="_blank" class="loc-activity">📚 מוזיאון POLIN</a>
+          <a href="https://www.google.com/maps/search/World+of+Illusion+Warsaw" target="_blank" class="loc-activity">🪞 World of Illusion</a>
+          <a href="https://www.google.com/maps/place/Złote+Tarasy+Warsaw" target="_blank" class="loc-activity">🛍️ Złote Tarasy</a>
+        </div>
+        <div class="loc-tip">💡 קונצרטים חינמיים בפסל שופן כל שבת ב-12 ו-16:00 בחודשי הקיץ!</div>
+        <div style="margin-top:10px; font-size:10px; font-weight:600; color:var(--gray-600); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:6px;">🍽️ מסעדות מומלצות</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <a href="https://www.google.com/maps/search/Jeff's+restaurant+Warsaw" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍔</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Jeff's</div><div style="font-size:10px; color:var(--gray-400);">4.6⭐ · אמריקאי · דיינר קלאסי · ליד השדה</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Hard+Rock+Cafe+Warsaw+Zlote+Tarasy" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🎸</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Hard Rock Cafe</div><div style="font-size:10px; color:var(--gray-400);">4.4⭐ · אמריקאי · Złote Tarasy · ליד הנובוטל</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Spacca+Napoli+Warsaw" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍕</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Spacca Napoli</div><div style="font-size:10px; color:var(--gray-400);">4.6⭐ · פיצה נפוליטנית · Świętokrzyska</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Ciao+Napoli+Warsaw+Old+Town" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍝</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Ciao Napoli</div><div style="font-size:10px; color:var(--gray-400);">4.6⭐ · איטלקי · העיר העתיקה · אווירה נהדרת</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Art+Sushi+Warsaw" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍱</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Art Sushi</div><div style="font-size:10px; color:var(--gray-400);">4.6⭐ · סושי · Nowogrodzka · ליד הנובוטל</div></div>
+          </a>
+        </div>
+        <a href="https://www.google.com/maps/search/Airport+Hotel+Okecie+Warsaw" target="_blank" style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11px; color:var(--red); text-decoration:none;">📷 Airport Hotel Okęcie — גוגל מפות + תמונות ↗</a>
+        <a href="https://www.google.com/maps/search/Novotel+Centrum+Warsaw" target="_blank" style="display:flex; align-items:center; gap:6px; margin-top:4px; font-size:11px; color:var(--red); text-decoration:none;">📷 Novotel Centrum — גוגל מפות + תמונות ↗</a>
+      </div>
+    </div>
+
+    <div class="loc-card">
+      <div class="loc-banner" style="background: linear-gradient(135deg, #1E3A5F 0%, #2563EB 100%);">
+        <div class="loc-banner-emoji">🍪</div>
+        <div class="loc-banner-overlay"></div>
+        <div class="loc-banner-title">טורון</div>
+        <div class="loc-banner-dates">14–15 יולי</div>
+      </div>
+      <div class="loc-body">
+        <div class="loc-desc">אחת הערים הגותיות השמורות ביותר באירופה. עיר הולדתו של קופרניקוס, ומפורסמת בזכות הג'ינג'ר ברד (Pierniki Toruńskie) שנאפה כאן מאז המאה ה-13!</div>
+        <div class="loc-facts">
+          <span class="loc-fact">🏛️ UNESCO</span>
+          <span class="loc-fact">🔭 עיר קופרניקוס</span>
+          <span class="loc-fact">🍪 גינג'ר ברד</span>
+        </div>
+        <div class="loc-activities">
+          <a href="https://bilety.zamek.malbork.pl/?lang=en" target="_blank" class="loc-activity">🏰 Malbork Castle 🎫</a>
+          <a href="https://muzeum.torun.pl" target="_blank" class="loc-activity">🍪 Muzeum Piernika</a>
+          <a href="https://www.google.com/maps/search/Tor-Tor+ice+rink+Torun" target="_blank" class="loc-activity">⛸️ Tor-Tor קרח</a>
+          <a href="https://www.google.com/maps/search/Torbyd+Bydgoszcz" target="_blank" class="loc-activity">⛸️ Torbyd בבידגושץ'</a>
+          <span class="loc-activity">🚶 העיר הגותית</span>
+        </div>
+        <div class="loc-tip">💡 קנו קופסת Pierniki Toruńskie לבית — הטעם האותנטי שונה לגמרי ממה שנמכר בחו"ל!</div>
+        <div style="margin-top:10px; font-size:10px; font-weight:600; color:var(--gray-600); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:6px;">🍽️ מסעדות מומלצות</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <a href="https://www.google.com/maps/search/Ricky+Ricky+z+Ameryki+Torun" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍔</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Ricky Ricky z Ameryki</div><div style="font-size:10px; color:var(--gray-400);">4.8⭐ · אמריקאי · הבורגר הכי טוב בטורון!</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Old+Metropolis+Podmurna+Torun" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍕</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Old Metropolis Podmurna 28</div><div style="font-size:10px; color:var(--gray-400);">4.8⭐ · איטלקי-פולני · העיר העתיקה · 6,126 ביקורות!</div></div>
+          </a>
+        </div>
+        <a href="https://www.google.com/maps/search/Hotel+Spichrz+Torun" target="_blank" style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11px; color:var(--red); text-decoration:none;">📷 Hotel Spichrz — גוגל מפות + תמונות ↗</a>
+      </div>
+    </div>
+
+    <div class="loc-card">
+      <div class="loc-banner" style="background: linear-gradient(135deg, #065F46 0%, #10B981 100%);">
+        <div class="loc-banner-emoji">🛶</div>
+        <div class="loc-banner-overlay"></div>
+        <div class="loc-banner-title">קשוביה</div>
+        <div class="loc-banner-dates">15–18 יולי</div>
+      </div>
+      <div class="loc-body">
+        <div class="loc-desc">אזור ייחודי עם תרבות ושפה משלו — ה"קשובים" אינם מגדירים עצמם כפולנים. 1,800 אגמות בין יערות אורן יוצרים נוף ירוק מהגן עדן. מושלם לשחייה, קיאקינג וטיולי יער.</div>
+        <div class="loc-facts">
+          <span class="loc-fact">🌊 1,800 אגמות</span>
+          <span class="loc-fact">🌲 יערות אורן</span>
+          <span class="loc-fact">🗣️ שפה קשובי</span>
+        </div>
+        <div class="loc-activities">
+          <a href="https://www.google.com/maps/search/kayaking+Stare+Czaple" target="_blank" class="loc-activity">🛶 קיאקינג</a>
+          <span class="loc-activity">🏊 שחייה</span>
+          <a href="https://www.google.com/maps/place/Szymbark+Kaszuby" target="_blank" class="loc-activity">🏠 סימברק — בית הפוך</a>
+          <a href="https://www.google.com/maps/search/Stadnina+Koni+Kolano+Kashubia" target="_blank" class="loc-activity">🐴 רכיבת סוסים</a>
+          <a href="https://www.google.com/maps/search/Spływy+Kajokowe+Stare+Czaple" target="_blank" class="loc-activity">🌲 Spływy Kajokowe 4.9⭐</a>
+        </div>
+        <div class="loc-tip">💡 יום טיול לגדנסק (~שעה) לחיפוש ענברים "זהב הצפון" בחוף!</div>
+        <div class="loc-warning">⚠️ Kaszubska Nirvana דורשים PLN 500 מזומן פיקדון בצ'ק-אין!</div>
+        <div style="margin-top:10px; font-size:10px; font-weight:600; color:var(--gray-600); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:6px;">🍽️ מסעדות באזור (~20 דק' בקארטוזי)</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <a href="https://www.google.com/maps/search/pizzeria+Italiana+Kartuzy" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍕</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Pizzeria Italiana Kartuzy</div><div style="font-size:10px; color:var(--gray-400);">4.2⭐ · פיצה · קארטוזי · 20 דק' מהצימר</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Restauracja+Aragac+Kartuzy" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🥘</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Restauracja Aragac</div><div style="font-size:10px; color:var(--gray-400);">4.8⭐ · ארמני-גרוזיני · ייחודי ומפתיע · קארטוזי</div></div>
+          </a>
+        </div>
+        <a href="https://www.google.com/maps/search/Kaszubska+Nirvana+Stare+Czaple" target="_blank" style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11px; color:#C0001C; text-decoration:none;">📷 Kaszubska Nirvana — גוגל מפות + תמונות ↗</a>
+      </div>
+    </div>
+
+    <div class="loc-card">
+      <div class="loc-banner" style="background: linear-gradient(135deg, #1C1C1E 0%, #374151 100%);">
+        <div class="loc-banner-emoji">🔭</div>
+        <div class="loc-banner-overlay"></div>
+        <div class="loc-banner-title">וורמיה</div>
+        <div class="loc-banner-dates">18–22 יולי</div>
+      </div>
+      <div class="loc-body">
+        <div class="loc-desc">אזור הייצור האינטלקטואלי של פולין — כאן פעל ניקולאוס קופרניקוס ושינה את תפיסת היקום. יערות עתיקים, אגמות, וערים עם היסטוריה עמוקה.</div>
+        <div class="loc-facts">
+          <span class="loc-fact">🔭 אזור קופרניקוס</span>
+          <span class="loc-fact">🦅 נשרים לבני זנב</span>
+          <span class="loc-fact">🐗 ביזון אירופי</span>
+        </div>
+        <div class="loc-activities">
+          <a href="https://www.frombork.art.pl/en/" target="_blank" class="loc-activity">🏛️ פרומבורק</a>
+          <a href="https://www.google.com/maps/search/Grunwald+nature+reserve+Warmia" target="_blank" class="loc-activity">🦅 שמורת גרומה</a>
+          <a href="https://www.google.com/maps/place/Olsztyn" target="_blank" class="loc-activity">🏙️ אולשטין</a>
+          <a href="https://wilczy-szaniec.pl/en/" target="_blank" class="loc-activity">🐺 Wolf's Lair</a>
+        </div>
+        <div class="loc-tip">💡 פרומבורק נמצא על שפת ים פנימי — שייט קצר ממלץ מאוד!</div>
+        <div class="loc-warning" style="margin-top:6px;">⚠️ Warmia Resort — נדרשת העברת בנק מראש!</div>
+        <div style="margin-top:10px; font-size:10px; font-weight:600; color:var(--gray-600); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:6px;">🍽️ מסעדות באולשטין (~20 דק')</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <a href="https://www.google.com/maps/search/Burgerownia+Olsztyn" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍔</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Burgerownia</div><div style="font-size:10px; color:var(--gray-400);">4.5⭐ · המבורגר אמריקאי · מרכז אולשטין</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Dali+la+casa+di+nonna+Olsztyn" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍝</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Dalì 2.0 — la casa di nonna</div><div style="font-size:10px; color:var(--gray-400);">4.8⭐ · איטלקי אותנטי · פיצה + ניוקי</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Rolki+Sushi+Olsztyn" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍱</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Rolki Sushi Fast Food</div><div style="font-size:10px; color:var(--gray-400);">4.9⭐ · סושי טרי מהיר · מחירים מצוינים!</div></div>
+          </a>
+        </div>
+        <a href="https://www.google.com/maps/search/Warmia+Resort+Gietrzwald" target="_blank" style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11px; color:var(--red); text-decoration:none;">📷 Warmia Resort — גוגל מפות + תמונות ↗</a>
+      </div>
+    </div>
+
+    <div class="loc-card">
+      <div class="loc-banner" style="background: linear-gradient(135deg, #1D4ED8 0%, #06B6D4 100%);">
+        <div class="loc-banner-emoji">🌊</div>
+        <div class="loc-banner-overlay"></div>
+        <div class="loc-banner-title">Suntago</div>
+        <div class="loc-banner-dates">22–23 יולי · לילה אחד</div>
+      </div>
+      <div class="loc-body">
+        <div class="loc-desc">הפארק המים הגדול ביותר בפולין — 32 מגלשות מים, גלים מלאכותיים, ג'קוזי, בריכות פנים ואחוץ. הכל תחת קורת גג אחת עם טמפרטורה שלמה. שלושה ימים של טהור כיף!</div>
+        <div class="loc-facts">
+          <span class="loc-fact">🎢 32 מגלשות</span>
+          <span class="loc-fact">🌡️ בריכות מחוממות</span>
+          <span class="loc-fact">✅ כרטיס כלול</span>
+        </div>
+        <div class="loc-activities">
+          <a href="https://parkofpoland.com/en/information" target="_blank" class="loc-activity">🌊 גלים מלאכותיים 🎫</a>
+          <span class="loc-activity">♨️ ג'קוזי</span>
+          <span class="loc-activity">🎢 מגלשות אדרנלין</span>
+          <span class="loc-activity">🍕 מסעדה</span>
+        </div>
+        <div style="margin-top:10px; padding:0.625rem 0.75rem; background:#E0F2FE; border-right:3px solid #0369A1; border-radius:0 var(--radius-sm) var(--radius-sm) 0; font-size:11px; color:#0369A1; line-height:1.6;">
+          🎫 <strong>כרטיסים לסונטגו:</strong> כדאי להזמין מראש באתר — <a href="https://parkofpoland.com/en/creator" target="_blank" style="color:#0369A1;">parkofpoland.com/en/creator</a><br>
+          ✅ קניה אונליין מבטיחה כניסה + כניסת עדיפות (Priority Entry)<br>
+          ⚠️ ביולי עמוס — בסופ"ש ייתכנו המתנות. אפשר גם לקנות בקבלת Suntago Village כאורחי מלון.<br>
+          💰 ~50$ למבוגר · ילדים לפי גובה · שעות: 10:00–21:00 (שישי-שבת עד 22:00)
+        </div>
+        <div style="margin-top:10px; font-size:10px; font-weight:600; color:var(--gray-600); letter-spacing:0.04em; text-transform:uppercase; margin-bottom:6px;">🍽️ מסעדות באזור</div>
+        <div style="display:flex; flex-direction:column; gap:5px;">
+          <a href="https://www.google.com/maps/search/Lets+Burger+Mszczonow" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍔</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Let's Burger</div><div style="font-size:10px; color:var(--gray-400);">4.8⭐ · המבורגרים · 1,254 ביקורות · Mszczonów · 5 דק'</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Fat+Daddy%27s+Zyrardow" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🍟</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Fat Daddy's</div><div style="font-size:10px; color:var(--gray-400);">4.9⭐ 🏆 · אמריקאי · Żyrardów · 15 דק' · הכי גבוה!</div></div>
+          </a>
+          <a href="https://www.google.com/maps/search/Karczma+U+Wodnika+Mszczonow" target="_blank" style="display:flex; align-items:center; gap:8px; text-decoration:none; background:var(--gray-100); border-radius:8px; padding:6px 10px;">
+            <span style="font-size:14px;">🥟</span>
+            <div><div style="font-size:12px; font-weight:600; color:var(--gray-800);">Karczma U Wodnika</div><div style="font-size:10px; color:var(--gray-400);">4.6⭐ · פולני מסורתי · Mszczonów · ממש ליד Suntago</div></div>
+          </a>
+        </div>
+        <a href="https://www.google.com/maps/search/Suntago+Village+Mszczonow" target="_blank" style="display:flex; align-items:center; gap:6px; margin-top:8px; font-size:11px; color:var(--red); text-decoration:none;">📷 Suntago Village — גוגל מפות + תמונות ↗</a>
+      </div>
+    </div>
+
+  </div>
+  <div style="height:1rem;"></div>
+</section>
+
+<!-- ==================== CURRENCY ==================== -->
+<section class="screen" id="screen-currency">
+  <div class="currency-hero">
+    <div class="currency-label">💶 שקל ↔ זלוטי</div>
+    <div class="currency-rate">1 ₪ ≈ <span id="rate-display">1.18</span> PLN</div>
+    <div class="currency-sub" id="rate-sub">שער משוער (PLN/ILS) · בדקו לפני יציאה</div>
+  </div>
+
+  <div class="converter-box">
+    <div class="converter-label">מחשבון מטבע</div>
+    <div class="converter-inputs">
+      <div class="conv-input-wrap">
+        <div class="conv-currency">₪ שקלים</div>
+        <input class="conv-input" type="number" id="ils-input" value="100" oninput="convertILS()" inputmode="decimal">
+      </div>
+      <div class="conv-arrow">⇄</div>
+      <div class="conv-input-wrap">
+        <div class="conv-currency">PLN זלוטי</div>
+        <input class="conv-input" type="number" id="pln-input" value="" oninput="convertPLN()" inputmode="decimal" placeholder="118">
+      </div>
+    </div>
+  </div>
+
+  <div class="section-title">💰 מחירים משוערים</div>
+  <div class="prices-grid">
+    <div class="price-card">
+      <div class="price-emoji">☕</div>
+      <div class="price-item">קפה</div>
+      <div class="price-val">8–12 PLN</div>
+    </div>
+    <div class="price-card">
+      <div class="price-emoji">🍽️</div>
+      <div class="price-item">ארוחת צהריים</div>
+      <div class="price-val">25–45 PLN</div>
+    </div>
+    <div class="price-card">
+      <div class="price-emoji">🍕</div>
+      <div class="price-item">פיצה</div>
+      <div class="price-val">30–50 PLN</div>
+    </div>
+    <div class="price-card">
+      <div class="price-emoji">🍺</div>
+      <div class="price-item">בירה</div>
+      <div class="price-val">8–15 PLN</div>
+    </div>
+    <div class="price-card">
+      <div class="price-emoji">🚕</div>
+      <div class="price-item">מונית (5 ק"מ)</div>
+      <div class="price-val">20–30 PLN</div>
+    </div>
+    <div class="price-card">
+      <div class="price-emoji">🎟️</div>
+      <div class="price-item">כרטיס מוזיאון</div>
+      <div class="price-val">20–40 PLN</div>
+    </div>
+    <div class="price-card">
+      <div class="price-emoji">🏨</div>
+      <div class="price-item">מלון 3★ (ללילה)</div>
+      <div class="price-val">200–400 PLN</div>
+    </div>
+    <div class="price-card">
+      <div class="price-emoji">⛽</div>
+      <div class="price-item">דלק (ליטר)</div>
+      <div class="price-val">6–7 PLN</div>
+    </div>
+  </div>
+
+  <div class="section-title">🪙 שטרות ומטבעות</div>
+  <div class="converter-box" style="margin-top:0;">
+    <div style="font-size:12px; color:var(--gray-600); line-height:1.7;">
+      <strong style="color:var(--gray-800);">שטרות:</strong> 10, 20, 50, 100, 200, 500 PLN<br>
+      <strong style="color:var(--gray-800);">מטבעות:</strong> 1, 2, 5 PLN + 1, 2, 5, 10, 20, 50 Groszy (100 גרוש = 1 PLN)<br><br>
+      <span style="color:var(--red);">⚠️</span> פיקדון Kaszubska Nirvana: <strong>500 PLN מזומן בלבד</strong>
+    </div>
+  </div>
+  <div style="height:1rem;"></div>
+</section>
+
+<!-- ==================== TRIVIA GAME ==================== -->
+<section class="screen" id="screen-game">
+  <div class="game-header">
+    <div class="game-header-title">🎯 טריוויה פולנית</div>
+    <div class="game-header-sub">כמה אתם יודעים על פולין?</div>
+    <div class="game-score-bar">
+      <div class="game-score-item">
+        <div class="game-score-num" id="score-correct">0</div>
+        <div class="game-score-label">נכון ✓</div>
+      </div>
+      <div class="game-score-item">
+        <div class="game-score-num" id="score-wrong">0</div>
+        <div class="game-score-label">טעות ✗</div>
+      </div>
+      <div class="game-score-item">
+        <div class="game-score-num" id="score-left">12</div>
+        <div class="game-score-label">נשאר</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="game-progress" style="margin-top:12px;">
+    <div class="game-progress-fill" id="progress-fill" style="width:0%"></div>
+  </div>
+
+  <div class="question-card" id="question-card">
+    <div class="q-num" id="q-num">שאלה 1 מתוך 12</div>
+    <div class="q-text" id="q-text"></div>
+    <div class="q-options" id="q-options"></div>
+    <div class="q-fact" id="q-fact"></div>
+    <button class="q-next-btn" id="q-next" onclick="nextQuestion()">השאלה הבאה ←</button>
+  </div>
+
+  <div class="game-over" id="game-over">
+    <div class="game-over-emoji" id="go-emoji">🏆</div>
+    <div class="game-over-title" id="go-title">כל הכבוד!</div>
+    <div class="game-over-score" id="go-score"></div>
+    <div class="game-over-sub" id="go-sub"></div>
+    <button class="game-restart" onclick="restartGame()">🔄 שחק שוב</button>
+  </div>
+</section>
+
+<!-- ==================== EMERGENCY ==================== -->
+<section class="screen" id="screen-emergency">
+  <div class="emergency-hero">
+    <div class="emergency-title">🆘 חירום ויצירת קשר</div>
+    <div class="emergency-sub">כל המספרים החשובים — לחצו להתקשרות</div>
+  </div>
+
+  <div class="emergency-list" style="margin-top:1rem;">
+
+    <div class="emergency-card">
+      <div class="emergency-section-label">🚨 חירום פולין</div>
+      <a class="emergency-item" href="tel:112">
+        <div class="emergency-icon" style="background:#FEE2E2; font-size:20px;">🚨</div>
+        <div class="emergency-text">
+          <div class="emergency-name">חירום כללי</div>
+          <div class="emergency-number">112</div>
+        </div>
+        <div class="emergency-call">📞 התקשר</div>
+      </a>
+      <a class="emergency-item" href="tel:999">
+        <div class="emergency-icon" style="background:#FEE2E2; font-size:20px;">🏥</div>
+        <div class="emergency-text">
+          <div class="emergency-name">אמבולנס</div>
+          <div class="emergency-number">999</div>
+        </div>
+        <div class="emergency-call">📞 התקשר</div>
+      </a>
+      <a class="emergency-item" href="tel:997">
+        <div class="emergency-icon" style="background:#FEE2E2; font-size:20px;">👮</div>
+        <div class="emergency-text">
+          <div class="emergency-name">משטרה</div>
+          <div class="emergency-number">997</div>
+        </div>
+        <div class="emergency-call">📞 התקשר</div>
+      </a>
+      <a class="emergency-item" href="tel:998">
+        <div class="emergency-icon" style="background:#FEF3C7; font-size:20px;">🚒</div>
+        <div class="emergency-text">
+          <div class="emergency-name">כבאות</div>
+          <div class="emergency-number">998</div>
+        </div>
+        <div class="emergency-call">📞 התקשר</div>
+      </a>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-section-label">🇮🇱 שגרירות ישראל</div>
+      <a class="emergency-item" href="tel:+48223500200">
+        <div class="emergency-icon" style="background:#E0F2FE; font-size:20px;">🇮🇱</div>
+        <div class="emergency-text">
+          <div class="emergency-name">שגרירות ישראל בוורשה</div>
+          <div class="emergency-number">+48 22 350 02 00</div>
+        </div>
+        <div class="emergency-call">📞 התקשר</div>
+      </a>
+      <a class="emergency-item" href="tel:+48223500228">
+        <div class="emergency-icon" style="background:#E0F2FE; font-size:20px;">🆘</div>
+        <div class="emergency-text">
+          <div class="emergency-name">חירום קונסולרי</div>
+          <div class="emergency-number">+48 22 350 02 28</div>
+        </div>
+        <div class="emergency-call">📞 התקשר</div>
+      </a>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-section-label">🏨 המלונות שלנו</div>
+      <a class="emergency-item" href="tel:+48224580100">
+        <div class="emergency-icon" style="background:#F3E8FF; font-size:20px;">🏨</div>
+        <div class="emergency-text">
+          <div class="emergency-name">Airport Hotel Okęcie</div>
+          <div class="emergency-number">+48 22 458 01 00</div>
+        </div>
+        <div class="emergency-call">📞</div>
+      </a>
+      <a class="emergency-item" href="tel:+48566100100">
+        <div class="emergency-icon" style="background:#F3E8FF; font-size:20px;">🏰</div>
+        <div class="emergency-text">
+          <div class="emergency-name">Hotel Spichrz, Toruń</div>
+          <div class="emergency-number">+48 56 610 01 00</div>
+        </div>
+        <div class="emergency-call">📞</div>
+      </a>
+      <a class="emergency-item" href="tel:+48226215900">
+        <div class="emergency-icon" style="background:#F3E8FF; font-size:20px;">🏙️</div>
+        <div class="emergency-text">
+          <div class="emergency-name">Novotel Centrum Warsaw</div>
+          <div class="emergency-number">+48 22 621 59 00</div>
+        </div>
+        <div class="emergency-call">📞</div>
+      </a>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-section-label">🚗 רכב + ביטוח</div>
+      <a class="emergency-item" href="tel:+48223072200">
+        <div class="emergency-icon" style="background:#FEF3C7; font-size:20px;">🚗</div>
+        <div class="emergency-text">
+          <div class="emergency-name">Budget Poland</div>
+          <div class="emergency-number">+48 22 307 22 00</div>
+        </div>
+        <div class="emergency-call">📞</div>
+      </a>
+      <a class="emergency-item" href="tel:+4480099">
+        <div class="emergency-icon" style="background:#D1FAE5; font-size:20px;">🩺</div>
+        <div class="emergency-text">
+          <div class="emergency-name">ביטוח נסיעות — מוקד</div>
+          <div class="emergency-number">פרטים על הפוליסה שלכם</div>
+        </div>
+        <div class="emergency-call">📞</div>
+      </a>
+    </div>
+
+    <div class="emergency-card">
+      <div class="emergency-section-label">📋 מידע כללי</div>
+      <div class="itin-stop" style="border:none; padding: 0.75rem 1rem;">
+        <div class="stop-text" style="font-size:12px; color:var(--gray-600); line-height:1.8;">
+          🔌 <strong>חשמל:</strong> 230V / תקע Type F (אירופי)<br>
+          💊 <strong>בתי מרקחת:</strong> APTEKA (סימן ירוק)<br>
+          🌐 <strong>אינטרנט:</strong> SIM פולנית ~20 PLN ל-10GB<br>
+          🚰 <strong>מים:</strong> אפשר לשתות מהברז<br>
+          💳 <strong>כרטיס אשראי:</strong> מקובל ברוב המקומות
+        </div>
+      </div>
+    </div>
+
+  </div>
+  <div style="height:1rem;"></div>
+</section>
+
+<!-- ==================== SPLASH ==================== -->
+<div id="splash">
+  <div class="splash-flag">🇵🇱</div>
+  <div class="splash-title">טיול פולין 2026</div>
+  <div class="splash-sub">משפחת דרור · 13–26 יולי</div>
+  <div class="splash-dots">
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+    <div class="splash-dot"></div>
+  </div>
+</div>
+
+<!-- ==================== INSTALL BANNER ==================== -->
+<div id="install-banner">
+  <span class="install-icon">📲</span>
+  <div class="install-text">
+    <div class="install-title">התקן כאפליקציה</div>
+    <div class="install-sub">עובד גם ללא אינטרנט</div>
+  </div>
+  <button class="install-btn" onclick="installApp()">התקן</button>
+  <button class="install-close" onclick="dismissInstall()">✕</button>
+</div>
+
+<!-- ==================== WORLD CUP ==================== -->
+<section class="screen" id="screen-wc">
+  <div style="background:linear-gradient(135deg,#1C1C2E 0%,#2D1B69 100%); padding:1.5rem 1.25rem 1.25rem; position:relative; overflow:hidden;">
+    <div style="position:absolute; right:-10px; top:-10px; font-size:100px; opacity:0.07; line-height:1;">⚽</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:11px; margin-bottom:4px;">FIFA World Cup 2026™ · ארה"ב, קנדה, מקסיקו</div>
+    <div style="color:white; font-size:22px; font-weight:700; margin-bottom:4px;">מונדיאל בדרך! ⚽</div>
+    <div style="color:rgba(255,255,255,0.7); font-size:12px;">כל השעות — שעון פולין (CEST) = ET + 6 שעות</div>
+    <div style="margin-top:12px; display:flex; gap:8px; flex-wrap:wrap;">
+      <span style="background:rgba(255,255,255,0.15); border-radius:20px; padding:4px 12px; font-size:11px; color:white;">🏆 גמר 19/7 · 21:00</span>
+      <span style="background:rgba(255,255,255,0.15); border-radius:20px; padding:4px 12px; font-size:11px; color:white;">📺 FOX Sports / beIN Sports</span>
+    </div>
+  </div>
+
+  <div class="section-title">📅 לוח משחקים — לפי מיקום שלנו</div>
+  <div style="padding:0 1rem; display:flex; flex-direction:column; gap:8px;">
+
+    <!-- QF - before trip -->
+    <div style="background:var(--white); border-radius:var(--radius); overflow:hidden; border:1px solid var(--gray-200); box-shadow:var(--shadow-card);">
+      <div style="background:#374151; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:10px; color:rgba(255,255,255,0.9); font-weight:600; text-transform:uppercase;">⚡ רבע גמר · לפני הטיול</div>
+        <div style="font-size:10px; color:rgba(255,255,255,0.6);">9–12 יולי · בישראל!</div>
+      </div>
+      <div style="padding:0.75rem 1rem; font-size:12px; color:var(--gray-600); line-height:1.8;">
+        9/7 · 22:00 — Boston &nbsp;|&nbsp; 10/7 · 21:00 — Los Angeles<br>
+        11/7 · 23:00 — Miami &nbsp;|&nbsp; 12/7 · 03:00 — Kansas City 🌙<br>
+        <span style="display:inline-block; margin-top:4px; background:var(--gray-100); padding:3px 8px; border-radius:6px; font-size:11px;">🏠 צפו מהסלון — עדיין בארץ!</span>
+      </div>
+    </div>
+
+    <!-- SF1 - Torun 14/7 -->
+    <div style="background:var(--white); border-radius:var(--radius); overflow:hidden; border:1px solid var(--gray-200); box-shadow:var(--shadow-card);">
+      <div style="background:#7C3AED; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:10px; color:white; font-weight:600; text-transform:uppercase;">🔥 חצי גמר 1</div>
+        <div style="font-size:10px; color:rgba(255,255,255,0.8);">14 יולי · ישנים בטורון</div>
+      </div>
+      <div style="padding:0.75rem 1rem; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:10px; font-size:13px; align-items:center; font-weight:600;">
+          <span style="color:var(--red); min-width:68px;">14/7 · 21:00</span>
+          <span style="color:var(--gray-800);">Dallas — AT&T Stadium</span>
+        </div>
+        <div style="background:#F5F3FF; border-radius:var(--radius-sm); padding:0.5rem 0.75rem; font-size:11px; color:#6D28D9; line-height:1.6;">
+          📍 Hotel Spichrz, Toruń · טורון<br>
+          🍺 <strong>Happy Drinkers Toruń</strong> — <a href="https://www.google.com/maps/search/Happy+Drinkers+Torun" target="_blank" style="color:#7C3AED;">גוגל מפות ↗</a><br>
+          4.7⭐ · פתוח עד 04:00 · מסכי ענק · בעיר העתיקה
+        </div>
+      </div>
+    </div>
+
+    <!-- SF2 - Kashubia 15/7 -->
+    <div style="background:var(--white); border-radius:var(--radius); overflow:hidden; border:1px solid var(--gray-200); box-shadow:var(--shadow-card);">
+      <div style="background:#7C3AED; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:10px; color:white; font-weight:600; text-transform:uppercase;">🔥 חצי גמר 2</div>
+        <div style="font-size:10px; color:rgba(255,255,255,0.8);">15 יולי · קשוביה</div>
+      </div>
+      <div style="padding:0.75rem 1rem; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:10px; font-size:13px; align-items:center; font-weight:600;">
+          <span style="color:var(--red); min-width:68px;">15/7 · 21:00</span>
+          <span style="color:var(--gray-800);">Atlanta — Mercedes-Benz Stadium</span>
+        </div>
+        <div style="background:#F5F3FF; border-radius:var(--radius-sm); padding:0.5rem 0.75rem; font-size:11px; color:#6D28D9; line-height:1.6;">
+          📍 Kaszubska Nirvana, Stare Czaple<br>
+          🍺 <strong>Spływy Kajokowe</strong> — <a href="https://www.google.com/maps/search/Spływy+Kajokowe+Stare+Czaple" target="_blank" style="color:#7C3AED;">גוגל מפות ↗</a> · 4.9⭐ ממש ליד הצימר<br>
+          🏙️ או נסיעה לגדנסק (~שעה) — <a href="https://www.google.com/maps/search/sport+bar+Gdansk" target="_blank" style="color:#7C3AED;">ספורט בארים ↗</a>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bronze 18/7 - Warmia -->
+    <div style="background:var(--white); border-radius:var(--radius); overflow:hidden; border:1px solid var(--gray-200); box-shadow:var(--shadow-card);">
+      <div style="background:#0369A1; padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:10px; color:white; font-weight:600; text-transform:uppercase;">🥉 גמר קטן</div>
+        <div style="font-size:10px; color:rgba(255,255,255,0.8);">18 יולי · וורמיה</div>
+      </div>
+      <div style="padding:0.75rem 1rem; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:10px; font-size:13px; align-items:center; font-weight:600;">
+          <span style="color:var(--red); min-width:68px;">18/7 · 23:00</span>
+          <span style="color:var(--gray-800);">Miami — Hard Rock Stadium</span>
+        </div>
+        <div style="background:#E0F2FE; border-radius:var(--radius-sm); padding:0.5rem 0.75rem; font-size:11px; color:#0369A1; line-height:1.6;">
+          📍 Warmia Resort, Gietrzwałd · וורמיה<br>
+          🍺 <strong>אולשטין</strong> (~20 דק') — <a href="https://www.google.com/maps/search/sport+bar+Olsztyn+city+center" target="_blank" style="color:#0369A1;">ספורט בארים ↗</a><br>
+          📺 או מהחדר ב-Warmia Resort (שידור ב-23:00)
+        </div>
+      </div>
+    </div>
+
+    <!-- Final 19/7 - Warmia -->
+    <div style="background:var(--white); border-radius:var(--radius); overflow:hidden; border:2px solid #F59E0B; box-shadow:var(--shadow-card);">
+      <div style="background:linear-gradient(135deg,#F59E0B,#EF4444); padding:0.5rem 1rem; display:flex; justify-content:space-between; align-items:center;">
+        <div style="font-size:10px; color:white; font-weight:700; text-transform:uppercase; letter-spacing:0.05em;">🏆 גמר!</div>
+        <div style="font-size:10px; color:rgba(255,255,255,0.9);">19 יולי · וורמיה!</div>
+      </div>
+      <div style="padding:0.75rem 1rem; display:flex; flex-direction:column; gap:8px;">
+        <div style="display:flex; gap:10px; font-size:13px; align-items:center; font-weight:600;">
+          <span style="color:var(--red); min-width:68px;">19/7 · 21:00</span>
+          <span style="color:var(--gray-800);">MetLife Stadium, NJ — הגמר!</span>
+        </div>
+        <div style="background:#FEF9C3; border-radius:var(--radius-sm); padding:0.5rem 0.75rem; font-size:11px; color:#92400E; line-height:1.6;">
+          📍 Warmia Resort, Gietrzwałd (עד 22/7)<br>
+          🍺 <strong>אולשטין</strong> (~20 דק') — <a href="https://www.google.com/maps/search/sport+bar+Olsztyn+city+center" target="_blank" style="color:#92400E;">ספורט בארים ↗</a><br>
+          🏟️ חפשו "Sport bar Olsztyn" בגוגל מראש — כדאי להזמין מקומות לגמר!<br>
+          📺 או ערב גמר בחצר Warmia Resort עם מקרן 🎉
+        </div>
+      </div>
+    </div>
+
+  </div>
+</section>
+
+<!-- ==================== BOTTOM NAV ==================== -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showScreen('home', this)">
+    <span class="icon">🏠</span>בית
+  </button>
+  <button class="nav-btn" onclick="showScreen('itin', this)">
+    <span class="icon">📅</span>לוח
+  </button>
+  <button class="nav-btn" onclick="showScreen('locs', this)">
+    <span class="icon">📍</span>יעדים
+  </button>
+  <button class="nav-btn" onclick="showScreen('wc', this)">
+    <span class="icon">⚽</span>מונדיאל
+  </button>
+  <button class="nav-btn" onclick="showScreen('currency', this)">
+    <span class="icon">💶</span>מטבע
+  </button>
+  <button class="nav-btn" onclick="showScreen('emergency', this)">
+    <span class="icon">🆘</span>חירום
+  </button>
+</nav>
+
+<script>
+// ====== NAVIGATION ======
+function showScreen(id, btn) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.querySelectorAll('.nav-btn').forEach(b => b.classList.remove('active'));
+  document.getElementById('screen-' + id).classList.add('active');
+  btn.classList.add('active');
+  window.scrollTo(0,0);
+}
+
+// ====== ITINERARY TOGGLE ======
+function toggleDay(el) {
+  el.classList.toggle('expanded');
+}
+
+// ====== COUNTDOWN ======
+function updateCountdown() {
+  const target = new Date('2026-07-13T06:00:00');
+  const now = new Date();
+  const diff = target - now;
+  if (diff <= 0) {
+    document.getElementById('cd-days').textContent = '✈️';
+    document.getElementById('cd-hours').textContent = '0';
+    document.getElementById('cd-mins').textContent = '0';
+    document.getElementById('cd-secs').textContent = '0';
+    return;
+  }
+  const days = Math.floor(diff / 86400000);
+  const hours = Math.floor((diff % 86400000) / 3600000);
+  const mins = Math.floor((diff % 3600000) / 60000);
+  const secs = Math.floor((diff % 60000) / 1000);
+  document.getElementById('cd-days').textContent = days;
+  document.getElementById('cd-hours').textContent = hours;
+  document.getElementById('cd-mins').textContent = mins;
+  document.getElementById('cd-secs').textContent = secs;
+}
+updateCountdown();
+setInterval(updateCountdown, 1000);
+
+// ====== WEATHER — מיקום לפי תאריך הטיול ======
+const TRIP_LOCATIONS = [
+  { from: new Date('2026-07-13'), to: new Date('2026-07-15'), name: 'וורשה', lat: 52.23, lon: 21.01 },
+  { from: new Date('2026-07-15'), to: new Date('2026-07-18'), name: 'קשוביה / Stare Czaple', lat: 54.25, lon: 18.04 },
+  { from: new Date('2026-07-18'), to: new Date('2026-07-22'), name: 'וורמיה / Gietrzwałd', lat: 53.76, lon: 20.23 },
+  { from: new Date('2026-07-22'), to: new Date('2026-07-23'), name: 'סונטגו / Mszczonów', lat: 51.98, lon: 20.47 },
+  { from: new Date('2026-07-23'), to: new Date('2026-07-27'), name: 'וורשה', lat: 52.23, lon: 21.01 },
+];
+
+function getTripLocation() {
+  const today = new Date();
+  for (const loc of TRIP_LOCATIONS) {
+    if (today >= loc.from && today < loc.to) return loc;
+  }
+  // לפני/אחרי הטיול — מציג וורשה
+  return { name: 'וורשה (יעד הטיול)', lat: 52.23, lon: 21.01 };
+}
+
+const WX_ICONS = {'0':'☀️','1':'🌤️','2':'⛅','3':'☁️','45':'🌫️','48':'🌫️','51':'🌦️','53':'🌦️','55':'🌧️','61':'🌧️','63':'🌧️','65':'🌧️','80':'🌦️','81':'🌧️','82':'⛈️','95':'⛈️'};
+const WX_DESC = {'0':'שמש','1':'בעיקר שמשי','2':'חלקית מעונן','3':'מעונן','45':'ערפל','51':'גשם קל','61':'גשם','80':'מקלחות','95':'סערה'};
+
+async function fetchWeather() {
+  try {
+    const loc = getTripLocation();
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${loc.lat}&longitude=${loc.lon}&daily=weathercode,temperature_2m_max,temperature_2m_min&timezone=Europe/Warsaw&forecast_days=2`;
+    const r = await fetch(url);
+    const d = await r.json();
+    const codes = d.daily.weathercode;
+    const maxT = d.daily.temperature_2m_max;
+    const minT = d.daily.temperature_2m_min;
+
+    const icon0 = WX_ICONS[String(codes[0])] || '🌡️';
+    const desc0 = WX_DESC[String(codes[0])] || '';
+    document.getElementById('wx-icon-today').textContent = icon0;
+    document.getElementById('wx-label-today').textContent = loc.name + ' היום';
+    document.getElementById('wx-val-today').textContent = `${Math.round(maxT[0])}° / ${Math.round(minT[0])}° ${desc0}`;
+
+    const icon1 = WX_ICONS[String(codes[1])] || '🌡️';
+    const desc1 = WX_DESC[String(codes[1])] || '';
+    document.getElementById('wx-icon-tmrw').textContent = icon1;
+    document.getElementById('wx-label-tmrw').textContent = loc.name + ' מחר';
+    document.getElementById('wx-val-tmrw').textContent = `${Math.round(maxT[1])}° / ${Math.round(minT[1])}° ${desc1}`;
+  } catch(e) {
+    document.getElementById('wx-val-today').textContent = 'לחץ לרענון';
+    document.getElementById('wx-val-tmrw').textContent = 'לחץ לרענון';
+  }
+}
+fetchWeather();
+
+// ====== EDITABLE REMINDERS ======
+const DEFAULT_REMINDERS = [
+  { emoji:'💶', text:'מזומן PLN 500 — פיקדון Kaszubska Nirvana', done:false },
+  { emoji:'🖨️', text:'הדפסת שובר Ofran לפני הטיסה (לא ניתן בנייד!)', done:false },
+  { emoji:'🏦', text:'תשלום Warmia Resort בהעברה בנקאית', done:false },
+  { emoji:'🎫', text:'הזמנת כרטיסים למוזיאון קופרניקוס מראש', done:false },
+  { emoji:'🎫', text:'כרטיסים לסונטגו — parkofpoland.com (ראו הסבר בדף הבית)', done:false },
+  { emoji:'📱', text:'קנייה סים פולני בשדה התעופה — Play / Orange / T-Mobile', done:false },
+  { emoji:'🪪', text:'רישיון בינלאומי ✅ בתוקף — 82541247 · עד 05/01/2027', done:true },
+  { emoji:'🩺', text:'ביטוח נסיעות — שמרו פרטי פוליסה', done:false },
+  { emoji:'🔌', text:'מטען USB לרכב (לטעינה בנסיעה)', done:false },
+  { emoji:'🔋', text:'מטען נייד (Power Bank) לסלולר', done:false },
+  { emoji:'📲', text:'מעמד לטלפון ברכב (לניווט GPS)', done:false },
+  { emoji:'🤳', text:'מוט סלפי', done:false },
+  { emoji:'🎬', text:'להוריד סרטים ב-Netflix לפני הטיסה (4 שעות!)', done:false },
+  { emoji:'🎵', text:'להוריד פלייליסט ב-Spotify לאופליין — לטיסה ולנסיעות', done:false },
+];
+
+let reminders = JSON.parse(localStorage.getItem('poland-reminders') || 'null') || DEFAULT_REMINDERS;
+
+function saveReminders() {
+  try { localStorage.setItem('poland-reminders', JSON.stringify(reminders)); } catch(e){}
+}
+
+function renderReminders() {
+  const list = document.getElementById('reminders-list');
+  list.innerHTML = '';
+  reminders.forEach((r, i) => {
+    const div = document.createElement('div');
+    div.style.cssText = `background:${r.done ? '#F0FDF4' : 'var(--white)'}; border-radius:var(--radius-sm); border:1px solid ${r.done ? '#BBF7D0' : 'var(--gray-200)'}; padding:0.625rem 0.875rem; display:flex; align-items:center; gap:10px; transition:all 0.2s;`;
+    div.innerHTML = `
+      <span style="font-size:18px; flex-shrink:0;">${r.emoji}</span>
+      <span style="flex:1; font-size:12px; color:${r.done ? 'var(--gray-400)' : 'var(--gray-800)'}; text-decoration:${r.done ? 'line-through' : 'none'}; line-height:1.4;">${r.text}</span>
+      <button onclick="toggleReminder(${i})" style="background:${r.done ? '#10B981' : 'var(--gray-200)'}; border:none; border-radius:50%; width:24px; height:24px; cursor:pointer; font-size:12px; flex-shrink:0; color:${r.done ? 'white' : 'var(--gray-600)'};">${r.done ? '✓' : '○'}</button>
+      <button onclick="deleteReminder(${i})" style="background:none; border:none; color:var(--gray-400); cursor:pointer; font-size:14px; flex-shrink:0; padding:0;">✕</button>
+    `;
+    list.appendChild(div);
+  });
+}
+
+function toggleReminder(i) {
+  reminders[i].done = !reminders[i].done;
+  saveReminders();
+  renderReminders();
+}
+
+function deleteReminder(i) {
+  reminders.splice(i, 1);
+  saveReminders();
+  renderReminders();
+}
+
+function addReminder() {
+  const text = prompt('תזכורת חדשה:');
+  if (!text || !text.trim()) return;
+  reminders.push({ emoji:'📌', text:text.trim(), done:false });
+  saveReminders();
+  renderReminders();
+}
+
+renderReminders();
+
+
+const RATE_ILS_TO_PLN = 1.18;
+
+function convertILS() {
+  const ils = parseFloat(document.getElementById('ils-input').value) || 0;
+  document.getElementById('pln-input').value = (ils * RATE_ILS_TO_PLN).toFixed(2);
+}
+function convertPLN() {
+  const pln = parseFloat(document.getElementById('pln-input').value) || 0;
+  document.getElementById('ils-input').value = (pln / RATE_ILS_TO_PLN).toFixed(2);
+}
+convertILS();
+
+// ====== TRIVIA GAME ======
+const questions = [
+  {
+    q: "מי מהמדענים הגדולים נולד בטורון, פולין?",
+    opts: ["אלברט איינשטיין", "ניקולאוס קופרניקוס", "מארי קירי", "גלילאו גליליי"],
+    ans: 1,
+    fact: "🔭 ניקולאוס קופרניקוס (1473) נולד בטורון וגילה שהארץ סובבת סביב השמש — מהפכה מדעית שינתה את ההיסטוריה!"
+  },
+  {
+    q: "מה הם 'Pierniki Toruńskie'?",
+    opts: ["בירה מקומית", "ג'ינג'ר ברד מיוחד", "גבינה פולנית", "ריקוד מסורתי"],
+    ans: 1,
+    fact: "🍪 ה-Pierniki Toruńskie נאפים בטורון מאז המאה ה-13 ומפורסמים בכל אירופה. יש אפילו מוזיאון שלם שלהם!"
+  },
+  {
+    q: "כמה אגמות יש באזור קשוביה?",
+    opts: ["כ-200", "כ-500", "כ-1,800", "כ-5,000"],
+    ans: 2,
+    fact: "🌊 קשוביה נקראת 'ארץ האגמות' — 1,800 אגמות בין יערות אורן. גן עדן לקיאקינג ושחייה!"
+  },
+  {
+    q: "מה המטבע של פולין?",
+    opts: ["אירו", "קרונה", "זלוטי (PLN)", "פורינט"],
+    ans: 2,
+    fact: "💵 פולין אינה חלק מגוש האירו ומשתמשת בזלוטי (PLN). 100 גרוש = 1 PLN."
+  },
+  {
+    q: "מוזיאון POLIN בוורשה עוסק ב...",
+    opts: ["האדריכלות הפולנית", "ההיסטוריה היהודית בפולין", "הפוליטיקה הפולנית", "הטבע הפולני"],
+    ans: 1,
+    fact: "📚 POLIN הוא מוזיאון ההיסטוריה של יהודי פולין — 1,000 שנות קיום יהודי בפולין. הוא ממוקם על אדמת גטו וורשה."
+  },
+  {
+    q: "מה הוא Suntago Waterpark?",
+    opts: ["פארק שעשועים ביבשה", "פארק המים הגדול בפולין", "פארק הסקי", "גן חיות מים"],
+    ans: 1,
+    fact: "🌊 Suntago הוא הפארק המים הגדול בפולין עם 32 מגלשות, גלים מלאכותיים ובריכות מחוממות — כולן תחת קורת גג אחת!"
+  },
+  {
+    q: "מה קרה לוורשה במלחמת העולם השנייה?",
+    opts: ["לא ניזוקה כלל", "ניזוקה חלקית", "נהרסה כמעט לחלוטין", "כבשה ללא קרב"],
+    ans: 2,
+    fact: "🏙️ הנאצים הרסו 85% מוורשה. לאחר המלחמה, הפולנים בנו מחדש את העיר העתיקה לבנה לבנה על בסיס ציורים ישנים. לכן היא UNESCO!"
+  },
+  {
+    q: "מה שפת קשוביה?",
+    opts: ["ניב של גרמנית", "שפה מיוחדת נפרדת מפולנית", "ניב של רוסית", "שפת הסימנים הפולנית"],
+    ans: 1,
+    fact: "🗣️ הקשובים הם עם ייחודי עם שפה, תרבות ודגל משלהם. רבים מהם אינם מגדירים עצמם כ'פולנים' אלא כ'קשובים'!"
+  },
+  {
+    q: "פרומבורק מפורסמת כי...",
+    opts: ["שם נולד שופן", "שם עבד קופרניקוס וגילה את תיאורו ההליוצנטרי", "שם כתב מיצקביץ' את שיריו", "שם נחתם הסכם השלום של ורסאי"],
+    ans: 1,
+    fact: "🔭 בפרומבורק גר וחקר קופרניקוס מ-1510 ועד מותו ב-1543. בקתדרלה שם הוא פרסם את תיאורו שהארץ סובבת את השמש!"
+  },
+  {
+    q: "מה מספר החירום הכללי בפולין?",
+    opts: ["911", "999", "112", "100"],
+    ans: 2,
+    fact: "📞 112 הוא מספר החירום האחיד באיחוד האירופי. בפולין גם 999 לאמבולנס, 997 למשטרה, 998 לכבאות."
+  },
+  {
+    q: "מהו המזחל הגדול ביותר בוורשה שנבנה מחדש כ-UNESCO?",
+    opts: ["Praga", "Nowy Świat", "Stare Miasto — העיר העתיקה", "Wilanów"],
+    ans: 2,
+    fact: "🏰 Stare Miasto (העיר העתיקה) של וורשה הוכרזה כאתר מורשת UNESCO ב-1980 — הוכרה כהישג ייחודי של שחזור עצמאי לאחר הרס מוחלט!"
+  },
+  {
+    q: "שופן — המלחין הגדול — קשור לוורשה כי...",
+    opts: ["כתב שם את כל יצירותיו", "נולד ליד וורשה ולמד שם", "מת שם ונקבר בה", "בנה שם את בית האופרה"],
+    ans: 1,
+    fact: "🎹 פרדריק שופן נולד ב-1810 ליד וורשה ולמד שם עד גיל 20. בפארק ליזנקי יש פסל מפורסם שלו עם קונצרטים חינמיים בקיץ!"
+  }
+];
+
+let currentQ = 0;
+let scoreCorrect = 0;
+let scoreWrong = 0;
+let shuffled = [];
+
+function shuffleArray(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+function startGame() {
+  currentQ = 0;
+  scoreCorrect = 0;
+  scoreWrong = 0;
+  shuffled = shuffleArray(questions);
+  document.getElementById('question-card').style.display = 'block';
+  document.getElementById('game-over').style.display = 'none';
+  updateScoreDisplay();
+  showQuestion();
+}
+
+function showQuestion() {
+  const q = shuffled[currentQ];
+  document.getElementById('q-num').textContent = `שאלה ${currentQ + 1} מתוך ${shuffled.length}`;
+  document.getElementById('q-text').textContent = q.q;
+  document.getElementById('q-fact').style.display = 'none';
+  document.getElementById('q-fact').textContent = '';
+  document.getElementById('q-next').style.display = 'none';
+  const fill = ((currentQ) / shuffled.length) * 100;
+  document.getElementById('progress-fill').style.width = fill + '%';
+
+  const opts = document.getElementById('q-options');
+  opts.innerHTML = '';
+  q.opts.forEach((opt, i) => {
+    const btn = document.createElement('button');
+    btn.className = 'q-option';
+    btn.textContent = opt;
+    btn.onclick = () => selectAnswer(i, q.ans, q.fact);
+    opts.appendChild(btn);
+  });
+}
+
+function selectAnswer(selected, correct, fact) {
+  const opts = document.querySelectorAll('.q-option');
+  opts.forEach((btn, i) => {
+    btn.classList.add('disabled');
+    if (i === correct) btn.classList.add('correct');
+    else if (i === selected && selected !== correct) btn.classList.add('wrong');
+  });
+
+  const factEl = document.getElementById('q-fact');
+  factEl.textContent = fact;
+  factEl.style.display = 'block';
+
+  if (selected === correct) scoreCorrect++;
+  else scoreWrong++;
+  updateScoreDisplay();
+
+  document.getElementById('q-next').style.display = 'block';
+  document.getElementById('q-next').textContent = 
+    currentQ < shuffled.length - 1 ? 'השאלה הבאה ←' : 'ראה תוצאות 🏆';
+}
+
+function updateScoreDisplay() {
+  document.getElementById('score-correct').textContent = scoreCorrect;
+  document.getElementById('score-wrong').textContent = scoreWrong;
+  document.getElementById('score-left').textContent = Math.max(0, shuffled.length - currentQ - 1);
+}
+
+function nextQuestion() {
+  currentQ++;
+  if (currentQ >= shuffled.length) {
+    showGameOver();
+  } else {
+    showQuestion();
+  }
+}
+
+function showGameOver() {
+  document.getElementById('question-card').style.display = 'none';
+  document.getElementById('progress-fill').style.width = '100%';
+  const go = document.getElementById('game-over');
+  go.style.display = 'block';
+
+  const pct = Math.round((scoreCorrect / shuffled.length) * 100);
+  let emoji, title, sub;
+  if (pct >= 90) { emoji = '🏆'; title = 'מומחה פולני!'; sub = 'וואו! אתה מוכן לטיול יותר ממה שחשבת!'; }
+  else if (pct >= 70) { emoji = '🥇'; title = 'מצוין!'; sub = 'ידע מרשים! יהיה לך טיול מדהים!'; }
+  else if (pct >= 50) { emoji = '😊'; title = 'לא רע!'; sub = 'עד הטיול תדע הרבה יותר!'; }
+  else { emoji = '📚'; title = 'יש מה ללמוד!'; sub = 'תקרא את המדריך ותנסה שוב!'; }
+
+  document.getElementById('go-emoji').textContent = emoji;
+  document.getElementById('go-title').textContent = title;
+  document.getElementById('go-score').textContent = `${scoreCorrect} / ${shuffled.length}`;
+  document.getElementById('go-sub').textContent = sub;
+}
+
+function restartGame() {
+  startGame();
+}
+
+startGame();
+
+// ====== PWA: GENERATE ICON SVG AS DATA URL ======
+function makeIconDataURL(size) {
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${size}" height="${size}" viewBox="0 0 ${size} ${size}">
+    <rect width="${size}" height="${size}" rx="${size*0.18}" fill="#FFFFFF"/>
+    <rect width="${size}" height="${size/2}" rx="${size*0.18}" fill="#FFFFFF"/>
+    <rect x="0" y="${size*0.18}" width="${size}" height="${size/2}" fill="#FFFFFF"/>
+    <rect x="0" y="${size/2}" width="${size}" height="${size/2}" rx="${size*0.05}" fill="#C0001C"/>
+    <rect x="0" y="${size/2-2}" width="${size}" height="4" fill="#C0001C"/>
+    <text x="${size/2}" y="${size*0.42}" font-size="${size*0.38}" text-anchor="middle" dominant-baseline="middle" font-family="system-ui">🇵🇱</text>
+  </svg>`;
+  return 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svg)));
+}
+
+// ====== PWA: INJECT MANIFEST DYNAMICALLY ======
+(function setupManifest() {
+  const icon192 = makeIconDataURL(192);
+  const icon512 = makeIconDataURL(512);
+  const manifest = {
+    name: "טיול פולין 2026 — משפחת דרור",
+    short_name: "פולין 2026",
+    description: "האפליקציה הרשמית לטיול המשפחתי לפולין, יולי 2026",
+    start_url: "./",
+    display: "standalone",
+    orientation: "portrait",
+    background_color: "#C0001C",
+    theme_color: "#C0001C",
+    lang: "he",
+    dir: "rtl",
+    icons: [
+      { src: icon192, sizes: "192x192", type: "image/svg+xml", purpose: "any maskable" },
+      { src: icon512, sizes: "512x512", type: "image/svg+xml", purpose: "any maskable" }
+    ]
+  };
+  const blob = new Blob([JSON.stringify(manifest)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  document.getElementById('pwa-manifest').href = url;
+
+  // Apple touch icon
+  const appleIcon = makeIconDataURL(180);
+  document.getElementById('apple-icon').href = appleIcon;
+})();
+
+// ====== PWA: SERVICE WORKER ======
+const SW_CODE = `
+const CACHE = 'poland-trip-v3';
+const ASSETS = ['./', './index.html'];
+
+// Install — cache immediately
+self.addEventListener('install', e => {
+  e.waitUntil(
+    caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
+  );
+});
+
+// Activate — delete old caches, take control immediately
+self.addEventListener('activate', e => {
+  e.waitUntil(
+    caches.keys().then(keys =>
+      Promise.all(keys.filter(k => k !== CACHE).map(k => caches.delete(k)))
+    ).then(() => self.clients.claim())
+  );
+});
+
+// Fetch — Network First: always try network, fall back to cache
+self.addEventListener('fetch', e => {
+  if (e.request.mode === 'navigate') {
+    // For page navigations: try network first, update cache, fall back to cache
+    e.respondWith(
+      fetch(e.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(e.request))
+    );
+  } else {
+    // For other assets: cache first
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    );
+  }
+});
+
+// Listen for skip-waiting message from page
+self.addEventListener('message', e => {
+  if (e.data === 'skipWaiting') self.skipWaiting();
+});
+`;
+
+if ('serviceWorker' in navigator) {
+  // מחק Service Workers ישנים — מבטיח תמיד גרסה עדכנית
+  navigator.serviceWorker.getRegistrations().then(regs => {
+    regs.forEach(r => r.unregister());
+  });
+  caches.keys().then(keys => keys.forEach(k => caches.delete(k)));
+
+  const swBlob = new Blob([SW_CODE], { type: 'application/javascript' });
+  const swUrl = URL.createObjectURL(swBlob);
+
+  navigator.serviceWorker.register(swUrl, { scope: './' })
+    .then(reg => {
+      // Check for updates every time the page loads
+      reg.update();
+
+      // When a new SW is waiting, show update banner
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner(newSW);
+          }
+        });
+      });
+    })
+    .catch(e => console.log('SW error:', e));
+
+  // When SW takes control, reload the page silently
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
+}
+
+function showUpdateBanner(newSW) {
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    width:calc(100% - 32px); max-width:398px;
+    background:#065F46; color:white; border-radius:14px;
+    padding:12px 14px; display:flex; align-items:center; gap:12px;
+    z-index:600; box-shadow:0 4px 24px rgba(0,0,0,0.3);
+    font-family:system-ui,sans-serif;
+  `;
+  banner.innerHTML = `
+    <span style="font-size:22px;">🔄</span>
+    <div style="flex:1;">
+      <div style="font-size:13px; font-weight:600;">גרסה חדשה זמינה!</div>
+      <div style="font-size:11px; opacity:0.8;">לחצו לעדכון האפליקציה</div>
+    </div>
+    <button onclick="this.closest('div').remove(); arguments[0].postMessage('skipWaiting');"
+      style="background:white; color:#065F46; border:none; border-radius:8px; padding:7px 14px;
+             font-size:12px; font-weight:700; cursor:pointer; font-family:system-ui;"
+      data-sw-ref>עדכן</button>
+  `;
+  // Attach SW reference to button
+  banner.querySelector('button').addEventListener('click', () => {
+    newSW.postMessage('skipWaiting');
+    banner.remove();
+  });
+  document.body.appendChild(banner);
+}
+
+// ====== PWA: INSTALL PROMPT ======
+let deferredPrompt = null;
+window.addEventListener('beforeinstallprompt', e => {
+  e.preventDefault();
+  deferredPrompt = e;
+  setTimeout(() => {
+    const banner = document.getElementById('install-banner');
+    banner.classList.add('show');
+  }, 3000);
+});
+
+window.addEventListener('appinstalled', () => {
+  document.getElementById('install-banner').classList.remove('show');
+  deferredPrompt = null;
+});
+
+function installApp() {
+  if (deferredPrompt) {
+    deferredPrompt.prompt();
+    deferredPrompt.userChoice.then(choice => {
+      document.getElementById('install-banner').classList.remove('show');
+      deferredPrompt = null;
+    });
+  } else {
+    // iOS fallback
+    alert('להתקנה באייפון:\n1. לחץ על כפתור השיתוף ⬆️\n2. בחר "הוסף למסך הבית"\n3. לחץ "הוסף"');
+  }
+}
+
+function dismissInstall() {
+  document.getElementById('install-banner').classList.remove('show');
+}
+
+// ====== SPLASH SCREEN ======
+window.addEventListener('load', () => {
+  setTimeout(() => {
+    const splash = document.getElementById('splash');
+    splash.classList.add('hide');
+    setTimeout(() => splash.remove(), 600);
+  }, 1400);
+});
+</script>
+</body>
+</html>
