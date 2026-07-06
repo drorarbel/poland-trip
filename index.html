@@ -2179,15 +2179,17 @@ function makeIconDataURL(size) {
 
 // ====== PWA: SERVICE WORKER ======
 const SW_CODE = `
-const CACHE = 'poland-trip-v1';
+const CACHE = 'poland-trip-v3';
 const ASSETS = ['./', './index.html'];
 
+// Install — cache immediately
 self.addEventListener('install', e => {
   e.waitUntil(
     caches.open(CACHE).then(c => c.addAll(ASSETS)).then(() => self.skipWaiting())
   );
 });
 
+// Activate — delete old caches, take control immediately
 self.addEventListener('activate', e => {
   e.waitUntil(
     caches.keys().then(keys =>
@@ -2196,21 +2198,91 @@ self.addEventListener('activate', e => {
   );
 });
 
+// Fetch — Network First: always try network, fall back to cache
 self.addEventListener('fetch', e => {
-  e.respondWith(
-    caches.match(e.request).then(r => r || fetch(e.request).catch(() =>
-      caches.match('./')
-    ))
-  );
+  if (e.request.mode === 'navigate') {
+    // For page navigations: try network first, update cache, fall back to cache
+    e.respondWith(
+      fetch(e.request)
+        .then(response => {
+          const clone = response.clone();
+          caches.open(CACHE).then(c => c.put(e.request, clone));
+          return response;
+        })
+        .catch(() => caches.match(e.request))
+    );
+  } else {
+    // For other assets: cache first
+    e.respondWith(
+      caches.match(e.request).then(r => r || fetch(e.request))
+    );
+  }
+});
+
+// Listen for skip-waiting message from page
+self.addEventListener('message', e => {
+  if (e.data === 'skipWaiting') self.skipWaiting();
 });
 `;
 
 if ('serviceWorker' in navigator) {
   const swBlob = new Blob([SW_CODE], { type: 'application/javascript' });
   const swUrl = URL.createObjectURL(swBlob);
+
   navigator.serviceWorker.register(swUrl, { scope: './' })
-    .then(() => console.log('SW registered'))
+    .then(reg => {
+      // Check for updates every time the page loads
+      reg.update();
+
+      // When a new SW is waiting, show update banner
+      reg.addEventListener('updatefound', () => {
+        const newSW = reg.installing;
+        newSW.addEventListener('statechange', () => {
+          if (newSW.state === 'installed' && navigator.serviceWorker.controller) {
+            showUpdateBanner(newSW);
+          }
+        });
+      });
+    })
     .catch(e => console.log('SW error:', e));
+
+  // When SW takes control, reload the page silently
+  let refreshing = false;
+  navigator.serviceWorker.addEventListener('controllerchange', () => {
+    if (!refreshing) {
+      refreshing = true;
+      window.location.reload();
+    }
+  });
+}
+
+function showUpdateBanner(newSW) {
+  const banner = document.createElement('div');
+  banner.style.cssText = `
+    position:fixed; bottom:80px; left:50%; transform:translateX(-50%);
+    width:calc(100% - 32px); max-width:398px;
+    background:#065F46; color:white; border-radius:14px;
+    padding:12px 14px; display:flex; align-items:center; gap:12px;
+    z-index:600; box-shadow:0 4px 24px rgba(0,0,0,0.3);
+    font-family:system-ui,sans-serif;
+  `;
+  banner.innerHTML = `
+    <span style="font-size:22px;">🔄</span>
+    <div style="flex:1;">
+      <div style="font-size:13px; font-weight:600;">גרסה חדשה זמינה!</div>
+      <div style="font-size:11px; opacity:0.8;">לחצו לעדכון האפליקציה</div>
+    </div>
+    <button onclick="this.closest('div').remove(); arguments[0].postMessage('skipWaiting');"
+      style="background:white; color:#065F46; border:none; border-radius:8px; padding:7px 14px;
+             font-size:12px; font-weight:700; cursor:pointer; font-family:system-ui;"
+      data-sw-ref>עדכן</button>
+  `;
+  // Attach SW reference to button
+  banner.querySelector('button').addEventListener('click', () => {
+    newSW.postMessage('skipWaiting');
+    banner.remove();
+  });
+  document.body.appendChild(banner);
 }
 
 // ====== PWA: INSTALL PROMPT ======
